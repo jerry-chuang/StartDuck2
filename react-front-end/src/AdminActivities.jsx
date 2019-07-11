@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Icon, Form, Select, Input, Button } from 'antd';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import {Link, Redirect} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 const { Option } = Select;
 class AdminActivities extends Component {

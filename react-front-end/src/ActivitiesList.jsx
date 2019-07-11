@@ -20,9 +20,9 @@ class ActivitiesList extends Component {
       }
 
   render() {
-    var shown = {
-      display: this.props.shown ? "block" : "none"
-    };
+    // var shown = {
+    //   display: this.props.shown ? "block" : "none"
+    // };
     var hidden = {
       display: this.props.shown ? "none" : "block"
     }
