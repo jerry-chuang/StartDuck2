@@ -11,6 +11,39 @@ App.use(Express.static('public'));
 App.get('/api/data', (req, res) => res.json({
   message: "Seems to work!",
 }));
+App.delete('/api/api/user_activities/:id', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.get('/api/users/:id', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.post('/api/user_agendas', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.get('/api/user_activities', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.get('/api/admin/categories', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.get('/api/admin/activities', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.get('/api/admin/activities/:id', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.patch('/api/admin/activities/:id', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+App.delete('/api/admin/activities', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+
+App.post('/api/admin/activities', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+
+
 
 App.listen(PORT, () => {
   // eslint-disable-next-line no-console
