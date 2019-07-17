@@ -2,6 +2,10 @@ const Express = require('express');
 const App = Express();
 const BodyParser = require('body-parser');
 const PORT = 8080;
+const ENV         = process.env.ENV || "development";
+require('dotenv').config();
+const knexConfig  = require("./knexfile");
+const knex        = require("knex")(knexConfig[ENV]);
 
 // Express Configuration
 App.use(BodyParser.urlencoded({ extended: false }));
