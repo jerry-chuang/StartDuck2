@@ -2,18 +2,35 @@
 
 const express = require('express');
 const router  = express.Router();
+const App = express();
 
 module.exports = (knex) => {
   // Sample GET route
 App.get('/data', (req, res) => res.json({
   message: "Seems to work!",
 }));
+
+App.get('/categories', (req, res) => {
+  let data = [];
+  knex
+      .select()
+      .table("categories")
+      .then(results => {
+          console.log(results);
+          data = results;
+          res.json(data);
+      });
+});
 App.delete('/user_activities/:id', (req, res) => res.json({
   message: "Seems to work!",
 }));
 App.get('/users/:id', (req, res) => res.json({
   message: "Seems to work!",
 }));
+App.post('/users/', (req, res) => {
+  console.log('req:', req)
+  
+});
 App.post('/user_agendas', (req, res) => res.json({
   message: "Seems to work!",
 }));
