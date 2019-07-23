@@ -11,9 +11,11 @@ const knex        = require("knex")(knexConfig[ENV]);
 App.use(BodyParser.urlencoded({ extended: false }));
 App.use(Express.static('public'));
 
-const apiRoutes = require("./api");
+const apiRoutes = require("./api.js");
 
-App.use("/users", apiRoutes(knex));
+App.use("/api", apiRoutes(knex));
+
+
 
 App.listen(PORT, () => {
   // eslint-disable-next-line no-console

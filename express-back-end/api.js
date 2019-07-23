@@ -6,11 +6,12 @@ const App = express();
 
 module.exports = (knex) => {
   // Sample GET route
-App.get('/data', (req, res) => res.json({
+router.get('/', (req, res) => res.json({
   message: "Seems to work!",
 }));
 
-App.get('/categories', (req, res) => {
+router.get('/categories', (req, res) => {
+  console.log('triggered categories route')
   let data = [];
   knex
       .select()
@@ -21,39 +22,39 @@ App.get('/categories', (req, res) => {
           res.json(data);
       });
 });
-App.delete('/user_activities/:id', (req, res) => res.json({
+router.delete('/user_activities/:id', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.get('/users/:id', (req, res) => res.json({
+router.get('/users/:id', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.post('/users/', (req, res) => {
+router.post('/users/', (req, res) => {
   console.log('req:', req)
   
 });
-App.post('/user_agendas', (req, res) => res.json({
+router.post('/user_agendas', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.get('/user_activities', (req, res) => res.json({
+router.get('/user_activities', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.get('/admin/categories', (req, res) => res.json({
+router.get('/admin/categories', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.get('/admin/activities', (req, res) => res.json({
+router.get('/admin/activities', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.get('/admin/activities/:id', (req, res) => res.json({
+router.get('/admin/activities/:id', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.patch('/admin/activities/:id', (req, res) => res.json({
+router.patch('/admin/activities/:id', (req, res) => res.json({
   message: "Seems to work!",
 }));
-App.delete('/admin/activities', (req, res) => res.json({
+router.delete('/admin/activities', (req, res) => res.json({
   message: "Seems to work!",
 }));
 
-App.post('/admin/activities', (req, res) => res.json({
+router.post('/admin/activities', (req, res) => res.json({
   message: "Seems to work!",
 }));
 

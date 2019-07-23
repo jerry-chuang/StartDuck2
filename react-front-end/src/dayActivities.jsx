@@ -11,7 +11,7 @@ class DayActivities extends React.Component{
     super(props)
     this.state = {
       activities: [],
-      categories: [],
+      categories: ['test1', 'test2'],
       filterActivities:[],
       email: this.props.cookies.get('email'),
       date: moment(),
@@ -46,13 +46,14 @@ class DayActivities extends React.Component{
       }
     })
     .then((response) => {
-      this.setState({
-        activities: response.data.activities,
-        filterActivities: response.data.activities,
-        categories: response.data.categories,
-        agenda: response.data.agenda,
-        user_activities_id: response.data.user_activities_id
-      });
+      console.log('response for api/user_activities', response)
+      // this.setState({
+      //   activities: response.data.activities,
+      //   filterActivities: response.data.activities,
+      //   categories: response.data.categories,
+      //   agenda: response.data.agenda,
+      //   user_activities_id: response.data.user_activities_id
+      // });
     })
     .catch((error) => {
       if (error) {
@@ -107,12 +108,12 @@ class DayActivities extends React.Component{
 
 
   checkFirstTimeUser = () => {
-
-    if(!this.state.agenda.length){
-      this.setState({
-        scheduleRedirect: true,
-      })
-    }
+    console.log('comment out function for testing')
+    // if(!this.state.agenda.length){
+    //   this.setState({
+    //     scheduleRedirect: true,
+    //   })
+    // }
   }
 
 
