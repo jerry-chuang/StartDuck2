@@ -6,20 +6,15 @@ const App = express();
 
 module.exports = (knex) => {
   // Sample GET route
-router.get('/', (req, res) => res.json({
-  message: "Seems to work!",
-}));
 
 router.get('/categories', (req, res) => {
-  console.log('triggered categories route')
-  let data = [];
   knex
       .select()
       .table("categories")
       .then(results => {
-          console.log(results);
-          data = results;
-          res.json(data);
+          res.json({
+            categories: results,
+          });
       });
 });
 router.delete('/user_activities/:id', (req, res) => res.json({

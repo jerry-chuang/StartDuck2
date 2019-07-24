@@ -16,6 +16,7 @@ class schedule extends React.Component{
     componentDidMount() {
         axios.get('/api/categories')
         .then((response) => {
+          console.log('response from api/categoreis', response)
           this.setState({
             categories: response.data.categories
           });
