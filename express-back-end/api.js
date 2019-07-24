@@ -5,8 +5,9 @@ const router  = express.Router();
 const App = express();
 
 module.exports = (knex) => {
-  // Sample GET route
-
+ 
+//converting the categories controller from StartDuck
+//categories#index
 router.get('/categories', (req, res) => {
   knex
       .select()
@@ -17,42 +18,156 @@ router.get('/categories', (req, res) => {
           });
       });
 });
-router.delete('/user_activities/:id', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.get('/users/:id', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.post('/users/', (req, res) => {
-  console.log('req:', req)
-  
-});
-router.post('/user_agendas', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.get('/user_activities', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.get('/admin/categories', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.get('/admin/activities', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.get('/admin/activities/:id', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.patch('/admin/activities/:id', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-router.delete('/admin/activities', (req, res) => res.json({
-  message: "Seems to work!",
-}));
 
+//converting the user_activities_controller from StartDuck
+//user_activities#index
+router.get('/user_activities', (req, res) => {
+  knex
+      .select()
+      .table("user_activities")
+      .then(results => {
+        console.log(results)
+          res.json({
+            results: results,
+          });
+      });
+});
+
+//user_activities#show
+router.get('/user_activities/:id', (req, res) => {
+  knex
+      .select()
+      .table("user_activities")
+      .then(results => {
+        console.log(results)
+          res.json({
+            results: results,
+          });
+      });
+});
+//user_activities#update
+router.put('/user_activities/:id', (req, res) => {
+  knex
+      .select()
+      .table("user_activities")
+      .then(results => {
+        console.log(results)
+          res.json({
+            results: results,
+          });
+      });
+});
+//user_activities#destroy
+router.delete('/user_activities/:id', (req, res) => {
+  knex
+      .select()
+      .table("user_activities")
+      .then(results => {
+        console.log(results)
+          res.json({
+            results: results,
+          });
+      });
+});
+
+//converting the user_agendas_controller
+//user_agendas#create
+router.post('/user_agendas', (req, res) => {
+  console.log(req)
+  //  knex('user_agendas')
+  //     .insert({username: req.body.username})
+  //     .then(res.status(200).send())
+  //     .catch(
+  //       function(error) {
+  //         console.error(error);
+  //       }
+  //     );
+});
+
+//converting users controller
+//users#create
+ router.post("/users", (req, res) => {
+   console.log("req for users#create", req)
+    knex('users')
+      .insert({email: req.body.email})
+      .then(res.status(200).send())
+      .catch(
+        function(error) {
+          console.error(error);
+        }
+      );
+  });
+//users#show
+router.get('/users/:id', (req, res) => {
+  knex
+      .select()
+      .table("users")
+      .then(results => {
+        console.log(results)
+          res.json({
+            results: results,
+          });
+      });
+});
+
+//converting admin/activities controller
+// admin/activities#index
+router.get('/admin/activities', (req, res) => {
+  knex
+      .select()
+      .table("activities")
+      .then(results => {
+          res.json({
+            activities: results,
+          });
+      });
+});
+// admin/activities#show
+router.get('/admin/activities/:id', (req, res) => {
+  knex('activities')
+      .select('*')
+      .where('id', req.params.id)
+      .then(results => {
+          res.json({
+            activity: results,
+          });
+      });
+});
+// admin/activities#destroy
+router.delete('/admin/activities:id', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+// admin/activities#create
 router.post('/admin/activities', (req, res) => res.json({
   message: "Seems to work!",
 }));
+// admin/activities#update
+router.patch('/admin/activities/:id', (req, res) => res.json({
+  message: "Seems to work!",
+}));
 
+
+//converting admin/categories controller
+// admin/categories#index
+router.get('/admin/categories', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+// admin/categories#destroy
+router.delete('/admin/categories:id', (req, res) => res.json({
+  message: "Seems to work!",
+}));
+// admin/categories#create
+router.post("/admin/categories", (req, res) => {
+  console.log("req for users#create", req)
+   knex('categories')
+     .insert({name: req.body.name})
+     .then(res.status(200).send())
+     .catch(
+       function(error) {
+         console.error(error);
+       }
+     );
+});
   // // insert username to database when put request to /users/
   // router.post("/", (req, res) => {
   //   knex('users')
