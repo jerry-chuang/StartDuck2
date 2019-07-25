@@ -45,7 +45,7 @@ router.get('/user_activities', (req, res) => {
           dt.setDate(dt.getDate() + 1);
         } 
         knex //find user_activities that's part of the agenda
-          .select()
+          .select('*', 'activities.name AS name', 'categories.name AS categories')
           .table("user_activities")
           .where('user_agenda_id', agendaID)
           .where('date', date)
@@ -53,12 +53,14 @@ router.get('/user_activities', (req, res) => {
           .join('categories', 'activities.category_id', 'categories.id')
           .orderBy('user_activities.id', 'DESC')
           .then(results => {
-            let categories = [results[0].name] // get list of unique categories
-            for (let i of results){
-              if(categories.indexOf(i.name) === -1){
-                categories.push(i.name)
-              }
-            }
+             const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
+              .map( category => {
+                return {
+                  id: results.find(item => item.categories  === category).id,
+                  name: category
+                }
+              }); 
+        
             res.json({
               activities: results,
               categories: categories,
