@@ -22,7 +22,7 @@ router.get('/categories', (req, res) => {
 //converting the user_activities_controller from StartDuck
 //user_activities#index
 router.get('/user_activities', (req, res) => {
-  const {email, date} = req.body
+  const {email, date} = req.query
   knex //find user by email
   .select()
   .table("users")
@@ -50,15 +50,20 @@ router.get('/user_activities', (req, res) => {
           .where('user_agenda_id', agendaID)
           .where('date', date)
           .join('activities', 'user_activities.activity_id', 'activities.id')
+          .join('categories', 'activities.category_id', 'categories.id')
           .orderBy('user_activities.id', 'DESC')
           .then(results => {
-            console.log('results from activities', results)
-            // const agendaID = results[0].id;
-            knex
-              .select('id')
-              res.json({
-                activities: agendaID,
-              });
+            let categories = [results[0].name] // get list of unique categories
+            for (let i of results){
+              if(categories.indexOf(i.name) === -1){
+                categories.push(i.name)
+              }
+            }
+            res.json({
+              activities: results,
+              categories: categories,
+              agenda: agendaDates,
+            });        
           });
       });
   });

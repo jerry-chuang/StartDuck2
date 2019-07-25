@@ -24,6 +24,7 @@ class DayActivities extends React.Component{
 
   componentDidMount() {
     this.getActivities();
+    console.log(this.state)
   }
 
   componentDidUpdate(prevProps){
@@ -39,21 +40,23 @@ class DayActivities extends React.Component{
   }
 
   getActivities(){
+    console.log('get activities called')
+    console.log('this.state.email', this.state.email, 'this.props.params', this.props.params.day)
     axios.get('/api/user_activities', {
       params:{
         email: this.state.email,
-        date: this.props.params
+        date: this.props.params.day
       }
     })
     .then((response) => {
       console.log('response for api/user_activities', response)
-      // this.setState({
-      //   activities: response.data.activities,
-      //   filterActivities: response.data.activities,
-      //   categories: response.data.categories,
-      //   agenda: response.data.agenda,
-      //   user_activities_id: response.data.user_activities_id
-      // });
+      this.setState({
+        activities: response.data.activities,
+        filterActivities: response.data.activities,
+        categories: response.data.categories,
+        agenda: response.data.agenda,
+        user_activities_id: response.data.user_activities_id
+      });
     })
     .catch((error) => {
       if (error) {
@@ -109,11 +112,11 @@ class DayActivities extends React.Component{
 
   checkFirstTimeUser = () => {
     console.log('comment out function for testing')
-    // if(!this.state.agenda.length){
-    //   this.setState({
-    //     scheduleRedirect: true,
-    //   })
-    // }
+    if(!this.state.agenda.length){
+      this.setState({
+        scheduleRedirect: true,
+      })
+    }
   }
 
 
