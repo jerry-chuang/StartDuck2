@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router  = express.Router();
-const App = express();
+
 
 module.exports = (knex) => {
  
@@ -22,15 +22,47 @@ router.get('/categories', (req, res) => {
 //converting the user_activities_controller from StartDuck
 //user_activities#index
 router.get('/user_activities', (req, res) => {
-  knex
+  const {email, date} = req.body
+  knex //find user by email
+  .select()
+  .table("users")
+  .where('email', email)
+  .then(results => {
+    const userID = results[0].id
+    knex //find most recent user_agenda
       .select()
-      .table("user_activities")
+      .table("user_agendas")
+      .where('user_id', userID)
+      .orderBy('id', 'DESC')
+      .limit('1')
       .then(results => {
-        console.log(results)
-          res.json({
-            results: results,
+        const {id, start_date, end_date} = results[0];
+        const agendaID = id;
+        let agendaDates = [];
+        let dt = new Date(start_date)
+        while (dt<= end_date){ // make array of dates that's part of the agenda
+          agendaDates.push(new Date(dt));
+          dt.setDate(dt.getDate() + 1);
+        } 
+        knex //find user_activities that's part of the agenda
+          .select()
+          .table("user_activities")
+          .where('user_agenda_id', agendaID)
+          .where('date', date)
+          .join('activities', 'user_activities.activity_id', 'activities.id')
+          .orderBy('user_activities.id', 'DESC')
+          .then(results => {
+            console.log('results from activities', results)
+            // const agendaID = results[0].id;
+            knex
+              .select('id')
+              res.json({
+                activities: agendaID,
+              });
           });
       });
+  });
+  
 });
 
 //user_activities#show
