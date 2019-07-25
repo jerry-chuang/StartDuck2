@@ -7,6 +7,7 @@ exports.seed = function(knex) {
       return knex('activities').insert([
         { id: 1,
           name:  'Buffalo Chicken Sandwiches',
+          category_id: 2,
           content: `
           ![Buffalo Chicken Sandwiches](  https://www.thecookierookie.com/wp-content/uploads/2015/09/buffalo-chicken-sandwiches-with-ranch-fried-pickles-6-of-11-500x375.jpg
           )
@@ -51,6 +52,7 @@ exports.seed = function(knex) {
   
         { id: 2,      
         name:  'Chipotle Black Bean and Rice Stew',
+        category_id: 2,
         content: `
         ![Chipotle Black Bean and Rice Stew](https://www.camelliabrand.com/static/wp-content/uploads/2015/07/ccc-chipotle-black-bean-soup-720x400.jpg)
 
@@ -93,6 +95,7 @@ exports.seed = function(knex) {
       },
       { id: 3,  
         name:  'Chorizo Meatloaf',
+        category_id: 2,
         content: `
         ![Chorizo Meatloaf](http://muybuenocookbook.com/wp-content/uploads/2014/01/Chorizo-and-Chipotle-Meatloaf1.jpg
         )
