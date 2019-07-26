@@ -3,6 +3,7 @@ import ActivityItem from './ActivityItem.jsx'
 import {Link} from "react-router-dom";
 import { Icon } from 'antd';
 import axios from 'axios';
+import * as moment from 'moment';
 
 
 class ActivitiesList extends Component {
@@ -11,13 +12,13 @@ class ActivitiesList extends Component {
   }
 
   onDelete = (event) => {
-        axios.delete(`/api/user_activities/${event.currentTarget.id}`, {
-        id: event.currentTarget.id
-      })
-        .then(response => {
-          this.props.handleRefresh()
-        })
-      }
+    axios.delete(`/api/user_activities/${event.currentTarget.id}`, {
+    id: event.currentTarget.id
+    })
+    .then(response => {
+      this.props.handleRefresh()
+    })
+  }
 
   render() {
     // var shown = {
@@ -29,12 +30,12 @@ class ActivitiesList extends Component {
 
     const activities = this.props.activities.map(activity => {
       return <div className="dayActivities_listBlock">
-             <div className="dayActivities_deleteButton">
-              <Icon id={activity.user_activities_id} onClick = {this.onDelete} style={ hidden } type="minus-circle" />
-             </div>
-             <Link to={`/${activity.date}/activities/${activity.id}`} >
-                <ActivityItem key = {activity.id} {...activity } />
-             </Link>
+              <div className="dayActivities_deleteButton">
+                <Icon id={activity.user_activities_id} onClick = {this.onDelete} style={ hidden } type="minus-circle" />
+              </div>
+              <Link to={`/${moment(activity.date).format('YYYY-MM-DD')}/activities/${activity.activity_id}`} >
+                  <ActivityItem key = {activity.activity_id} {...activity } />
+              </Link>
              </div>
     })
     return (

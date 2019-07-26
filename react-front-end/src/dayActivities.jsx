@@ -40,8 +40,6 @@ class DayActivities extends React.Component{
   }
 
   getActivities(){
-    console.log('get activities called')
-    console.log('this.state.email', this.state.email, 'this.props.params', this.props.params.day)
     axios.get('/api/user_activities', {
       params:{
         email: this.state.email,
@@ -111,7 +109,6 @@ class DayActivities extends React.Component{
 
 
   checkFirstTimeUser = () => {
-    console.log('comment out function for testing')
     if(!this.state.agenda.length){
       this.setState({
         scheduleRedirect: true,
@@ -121,6 +118,8 @@ class DayActivities extends React.Component{
 
 
   render(){
+    console.log('this.state.date', this.state.date)
+    console.log('formated date', this.state.date.format('YYYY-MM-DD'))
     if(this.state.redirect){ //redirect to selected days on calendar
       return (
           <Redirect to={`/${this.state.date.format('YYYY-MM-DD')}/activities`}/>
