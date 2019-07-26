@@ -6,6 +6,7 @@ import { Icon } from 'antd';
 import { Calendar } from 'antd';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
+import * as moment from 'moment';
 
 class TodayActivity extends Component {
     constructor(props) {
@@ -22,7 +23,7 @@ class TodayActivity extends Component {
     }
 
     componentDidMount() {
-		this.fetchActivity(this.props.params.activityID);
+		this.fetchActivity();
     }
 
     componentDidUpdate (prevProps) {
@@ -35,18 +36,21 @@ class TodayActivity extends Component {
         }
     }
 
-    fetchActivity = (activityID) => {
+    fetchActivity = () => {
         axios.get('/api/user_activities/:id', {
             params: {
                 email: this.state.email,
-                date: this.props.params
+                date: this.props.params.day,
+                activityID: this.props.params.activityID
             }
         })
             .then((response) => {
+                console.log(response)
                 // handle success
                 const activity = response.data.activities.find(element => {
-                    return element.id === Number(this.props.params.activityID);
+                    return element.activity_id === Number(this.props.params.activityID);
                 })
+                console.log('setting activity', activity)
                 this.setState({
                     activities: response.data.activities,
                     categories: response.data.categories,
@@ -72,12 +76,12 @@ class TodayActivity extends Component {
     complete = (event) => {      
         axios.patch(`/api/user_activities/${this.props.params.activityID}`, {
             email: this.state.email,
-            completeness: !this.state.activity.completeness
+            is_complete: !this.state.activity.is_complete
         }) 
             .then((response) => {         
                 let activity = {...this.state.activity}
-                activity.completeness = !this.state.activity.completeness
-                if(activity.completeness){
+                activity.is_complete = !this.state.activity.is_complete
+                if(activity.is_complete){
                     this.setState({
                         activity:activity,
                         redirect:true,
@@ -113,7 +117,7 @@ class TodayActivity extends Component {
 
     render() {
 
-        console.log('this.props', this.props)
+        console.log('this.state.activity', this.state.activity)
         if(this.state.redirect){
             return (
                 <Redirect to={`/${this.state.date}/activities`}/>
@@ -124,7 +128,7 @@ class TodayActivity extends Component {
             <section className="dayActivity">
 
                 <div className="sideBarSchedule">
-                    <h3 className="dayHeading">{this.props.params.day}
+                    <h3 className="dayHeading">{moment(this.props.params.day).format('dddd, MMMM Do YYYY')}
                     <div className="todayActivityIcon">
                             <Icon style={{ fontSize: '35px' }} type="calendar" onClick={this.handleClick} />
                         </div>
@@ -141,17 +145,17 @@ class TodayActivity extends Component {
                         <TodayActivityBox activity={this.state.activity} />
                     </div>
                     <div className="Completeness">
-                        <span>Status: {this.state.activity.completeness ? "Complete":"Incomplete"}	</span>
+                        <span>Status: {this.state.activity.is_complete ? "Complete":"Incomplete"}	</span>
                     </div>
                     <div className="TodayContent">
 						<ReactMarkdown source={this.state.activity.content} />
                     </div>
 
-                    <button className={this.state.activity.completeness? 
+                    <button className={this.state.activity.is_complete? 
                                         "todayActivity_cancel":
                                         "todayActivity_complete"}
                             onClick={this.complete}>
-                        {this.state.activity.completeness ? "Wait! I'm not done yet!":"Complete Activity!"}
+                        {this.state.activity.is_complete ? "Wait! I'm not done yet!":"Complete Activity!"}
                     </button>
                 </div>
 
