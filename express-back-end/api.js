@@ -74,15 +74,55 @@ router.get('/user_activities', (req, res) => {
 
 //user_activities#show
 router.get('/user_activities/:id', (req, res) => {
-  knex
+  //TO BE FIXED: Currently has same function as the index route
+  console.log(req.query)
+  const {email, date} = req.query
+  knex //find user by email
+  .select()
+  .table("users")
+  .where('email', email)
+  .then(results => {
+    const userID = results[0].id
+    knex //find most recent user_agenda
       .select()
-      .table("user_activities")
+      .table("user_agendas")
+      .where('user_id', userID)
+      .orderBy('id', 'DESC')
+      .limit('1')
       .then(results => {
-        console.log(results)
-          res.json({
-            results: results,
+        const {id, start_date, end_date} = results[0];
+        const agendaID = id;
+        let agendaDates = [];
+        let dt = new Date(start_date)
+        while (dt<= end_date){ // make array of dates that's part of the agenda
+          agendaDates.push(new Date(dt));
+          dt.setDate(dt.getDate() + 1);
+        } 
+        knex //find user_activities that's part of the agenda
+          .select('*', 'activities.name AS name', 'categories.name AS categories')
+          .table("user_activities")
+          .where('user_agenda_id', agendaID)
+          .where('date', date)
+          .join('activities', 'user_activities.activity_id', 'activities.id')
+          .join('categories', 'activities.category_id', 'categories.id')
+          .orderBy('user_activities.id', 'DESC')
+          .then(results => {
+             const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
+              .map( category => {
+                return {
+                  id: results.find(item => item.categories  === category).id,
+                  name: category
+                }
+              }); 
+        
+            res.json({
+              activities: results,
+              categories: categories,
+              agenda: agendaDates,
+            });        
           });
       });
+  });
 });
 //user_activities#update
 router.put('/user_activities/:id', (req, res) => {
