@@ -22,7 +22,7 @@ router.get('/categories', (req, res) => {
 //converting the user_activities_controller from StartDuck
 //user_activities#index
 router.get('/user_activities', (req, res) => {
-  const {email, date, activityID} = req.query
+  const {email, date} = req.query
   knex //find user by email
   .select()
   .table("users")
@@ -49,7 +49,6 @@ router.get('/user_activities', (req, res) => {
           .table("user_activities")
           .where('user_agenda_id', agendaID)
           .where('date', date)
-          // .where('activity_id',activyID)
           .join('activities', 'user_activities.activity_id', 'activities.id')
           .join('categories', 'activities.category_id', 'categories.id')
           .orderBy('user_activities.id', 'DESC')
