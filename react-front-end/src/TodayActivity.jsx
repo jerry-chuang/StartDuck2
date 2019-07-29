@@ -84,27 +84,28 @@ this.setState({
 });
 }
 
-complete = (event) => {      
-axios.patch(`/api/user_activities/${this.props.params.activityID}`, {
+complete = (event) => {    
+  axios.patch(`/api/user_activities/${this.props.params.activityID}`, 
+  {
     email: this.state.email,
     is_complete: !this.state.activity.is_complete
-}) 
-    .then((response) => {         
-        let activity = {...this.state.activity}
-        activity.is_complete = !this.state.activity.is_complete
-        if(activity.is_complete){
-            this.setState({
-                activity:activity,
-                redirect:true,
-            })
-        }   else {
-            this.setState({
-                activity:activity,
-            })
-        }
-        
-        this.fetchActivity()
-    })
+  }) 
+    .then((response) => {
+      console.log(response)         
+      let activity = {...this.state.activity}
+      activity.is_complete = !this.state.activity.is_complete
+      if(activity.is_complete){
+          this.setState({
+              activity:activity,
+              // redirect:true, //comment out for debugging
+          })
+      } else {
+        this.setState({
+            activity: activity,
+        })
+      }     
+      this.fetchActivity()
+  })
 }
 
 onFullRender = (value) => {

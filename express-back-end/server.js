@@ -9,13 +9,26 @@ const knex        = require("knex")(knexConfig[ENV]);
 
 // Express Configuration
 App.use(BodyParser.urlencoded({ extended: false }));
+App.use(BodyParser.json()) //included to allow axios to pass json objects
 App.use(Express.static('public'));
+
+//for CORS issues:
+// var allowCrossDomain = function(req, res, next) {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+//   // intercept OPTIONS method
+//   if ('OPTIONS' == req.method) {
+//   res.sendStatus(200);
+//   } else {
+//   next();
+//   }
+//   };
+//   App.use(allowCrossDomain);
 
 const apiRoutes = require("./api.js");
 
 App.use("/api", apiRoutes(knex));
-
-
 
 App.listen(PORT, () => {
   // eslint-disable-next-line no-console

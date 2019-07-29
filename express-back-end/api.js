@@ -74,6 +74,7 @@ router.get('/user_activities', (req, res) => {
 
 //user_activities#show
 router.get('/user_activities/:id', (req, res) => {
+  // console.log('activity get req', req.body)
   const {activityID} = req.query
   knex
     .select()
@@ -86,12 +87,13 @@ router.get('/user_activities/:id', (req, res) => {
     })
 });
 //user_activities#update
-router.put('/user_activities/:id', (req, res) => {
+router.patch('/user_activities/:id', (req, res) => {
+  console.log('req.body', req.body, req.query)
   knex
       .select()
       .table("user_activities")
       .then(results => {
-        console.log(results)
+        // console.log(results)
           res.json({
             results: results,
           });
