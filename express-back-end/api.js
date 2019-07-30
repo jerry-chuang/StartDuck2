@@ -45,7 +45,7 @@ router.get('/user_activities', (req, res) => {
           dt.setDate(dt.getDate() + 1);
         } 
         knex //find user_activities that's part of the agenda
-          .select('*', 'activities.name AS name', 'categories.name AS categories')
+          .select('*', 'activities.name AS name', 'categories.name AS categories', 'user_activities.id AS user_activitiy_id')
           .table("user_activities")
           .where('user_agenda_id', agendaID)
           .where('date', date)
@@ -75,11 +75,12 @@ router.get('/user_activities', (req, res) => {
 //user_activities#show
 router.get('/user_activities/:id', (req, res) => {
   // console.log('activity get req', req.body)
-  const {activityID} = req.query;
+  const {user_activity_id} = req.query;
   knex
     .select()
-    .table('activities')
-    .where('id', activityID)
+    .table('user_activities')
+    .where('user_activities.id', user_activity_id)
+    .join('activities','user_activities.activity_id', 'activities.id' )
     .then(results =>{
       res.json({
         activity: results[0]
