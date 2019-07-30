@@ -75,7 +75,7 @@ router.get('/user_activities', (req, res) => {
 //user_activities#show
 router.get('/user_activities/:id', (req, res) => {
   // console.log('activity get req', req.body)
-  const {activityID} = req.query
+  const {activityID} = req.query;
   knex
     .select()
     .table('activities')
@@ -87,18 +87,39 @@ router.get('/user_activities/:id', (req, res) => {
     })
 });
 //user_activities#update
+//TODO: Implement validations so user_activities and activities can be 1 to 1
+//currently directly converting old logic
 router.patch('/user_activities/:id', (req, res) => {
-  console.log('req.body', req.body, req.query)
-  knex
+  console.log('req.body', req.body)
+  const {email, is_complete} = req.body;
+  const {id} = req.params;
+  const activityID = id;
+  knex //find user by email
+  .select()
+  .table('users')
+  .where('email', email)
+    .then(results => {
+      const userID = results[0].id
+      knex //find most recent user_agenda
       .select()
-      .table("user_activities")
+      .table('user_agendas')
+      .where('user_id', userID)
+      .orderBy('id', 'DESC')
+      .limit('1')
       .then(results => {
-        // console.log(results)
-          res.json({
-            results: results,
-          });
-      });
+        const {id} = results[0];
+        const agendaID = id;
+        // console.log(agendaID, activityID)
+        knex('user_activities')
+        .where('user_agenda_id', agendaID)
+        .where('activity_id', activityID)
+        .update({'is_complete': is_complete})
+        .then(res.status(200).send())
+      })
+    })
 });
+
+
 //user_activities#destroy
 router.delete('/user_activities/:id', (req, res) => {
   knex

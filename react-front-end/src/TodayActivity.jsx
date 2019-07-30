@@ -90,8 +90,7 @@ complete = (event) => {
     email: this.state.email,
     is_complete: !this.state.activity.is_complete
   }) 
-    .then((response) => {
-      console.log(response)         
+    .then((response) => {      
       let activity = {...this.state.activity}
       activity.is_complete = !this.state.activity.is_complete
       if(activity.is_complete){
