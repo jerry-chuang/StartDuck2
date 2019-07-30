@@ -31,10 +31,10 @@ class ActivitiesList extends Component {
     const activities = this.props.activities.map(activity => {
       return <div className="dayActivities_listBlock">
               <div className="dayActivities_deleteButton">
-                <Icon id={activity.user_activities_id} onClick = {this.onDelete} style={ hidden } type="minus-circle" />
+                <Icon key={activity.user_activitiy_id} onClick = {this.onDelete} style={ hidden } type="minus-circle" />
               </div>
-              <Link to={`/${moment(activity.date).format('YYYY-MM-DD')}/activities/${activity.activity_id}`} >
-                  <ActivityItem key = {activity.activity_id} {...activity } />
+              <Link to={`/${moment(activity.date).format('YYYY-MM-DD')}/activities/${activity.user_activitiy_id}`} >
+                  <ActivityItem key = {activity.user_activitiy_id} {...activity } />
               </Link>
              </div>
     })

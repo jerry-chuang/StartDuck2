@@ -38,9 +38,10 @@ class TodayActivity extends Component {
   }
 
   fetchActivity = () => {
+    console.log('this.props.params', this.props.params)
     axios.get('/api/user_activities/:id', {
       params: {
-        activityID: this.props.params.activityID
+        user_activity_id: this.props.params.activityID
       }
     })
     .then((response) => {

@@ -53,7 +53,6 @@ class DayActivities extends React.Component{
         filterActivities: response.data.activities,
         categories: response.data.categories,
         agenda: response.data.agenda,
-        user_activities_id: response.data.user_activities_id
       });
     })
     .catch((error) => {
