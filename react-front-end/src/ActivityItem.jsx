@@ -6,7 +6,7 @@ const ActivityItem = (props) => {
         <div className="activities_activityItem">
           <span>{props.duration} m</span>
           <span>{props.name}</span>
-          <input type="checkbox" disabled={true} checked={props.completeness} />
+          <input type="checkbox" disabled={true} checked={props.is_complete} />
         </div>
     );
 }
