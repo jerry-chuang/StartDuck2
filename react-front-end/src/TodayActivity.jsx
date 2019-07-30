@@ -97,7 +97,7 @@ complete = (event) => {
       if(activity.is_complete){
           this.setState({
               activity:activity,
-              // redirect:true, //comment out for debugging
+              redirect:true,
           })
       } else {
         this.setState({
