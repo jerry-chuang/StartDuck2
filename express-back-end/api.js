@@ -123,15 +123,13 @@ router.patch('/user_activities/:id', (req, res) => {
 
 //user_activities#destroy
 router.delete('/user_activities/:id', (req, res) => {
+  const {id} = req.params;
   knex
       .select()
       .table("user_activities")
-      .then(results => {
-        console.log(results)
-          res.json({
-            results: results,
-          });
-      });
+      .where('id', id)
+      .del()
+      .then(res.status(200).send());
 });
 
 //converting the user_agendas_controller
