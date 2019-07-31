@@ -135,15 +135,54 @@ router.delete('/user_activities/:id', (req, res) => {
 //converting the user_agendas_controller
 //user_agendas#create
 router.post('/user_agendas', (req, res) => {
-  console.log(req)
-  //  knex('user_agendas')
-  //     .insert({username: req.body.username})
-  //     .then(res.status(200).send())
-  //     .catch(
-  //       function(error) {
-  //         console.error(error);
-  //       }
-  //     );
+  console.log(req.body)
+  const {email, start_date, end_date, categories, hours_per_day} = req.body;
+  knex //find user by email
+  .select()
+  .table('users')
+  .where('email', email)
+    .then(results => {
+      const userID = results[0].id
+      knex //create new user agenda
+      .select()
+      .table('user_agendas')
+      .insert({
+        user_id: userID,
+        start_date: start_date,
+        end_date: end_date,
+        hours_per_day: hours_per_day,
+      })
+      .then(
+        knex //find the created user_agenda id
+      .select('user_agendas.id AS user_agenda_id')
+      .table('user_agendas')
+      .where('user_id', userID)
+      .orderBy('id', 'DESC')
+      .limit('1')
+      .then(results => {
+        const {user_agenda_id} = results[0]; 
+        // console.log(agendaID, activityID)
+        knex('user_activities')
+        .where('user_agenda_id', agendaID)
+        .where('activity_id', activityID)
+        .update({'is_complete': is_complete})
+        .then(res.status(200).send())
+      })
+
+      )
+  
+    })
+   knex('user_agendas')
+      .insert({
+        username: req.body.username,
+        
+      })
+      .then(res.status(200).send())
+      .catch(
+        function(error) {
+          console.error(error);
+        }
+      );
 });
 
 //converting users controller
