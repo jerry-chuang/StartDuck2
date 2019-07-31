@@ -161,12 +161,43 @@ router.post('/user_agendas', (req, res) => {
       .limit('1')
       .then(results => {
         const {user_agenda_id} = results[0]; 
+        /*
+          psuedo code for business logic:
+          let unpicked activities = find all activities outer join user_activities where is_complete = false
+          
+          then 
+
+          let recommended_activities = [];
+          for date of (Array of unique dates){
+            let duration = hours_per_day*60;
+            for (activity of unpicked activities){
+              if activity.duration <= duration{
+                recommedend_activites.push(
+                  activity_id: activity.id,
+                  date: date
+                )
+              duration -= activity.duration
+              if duration <= 0
+              break
+              }
+            }
+          }
+
+          for activity in recommended activities
+            knex(user_activities)
+            .insert(
+              activity_id: activity.activity_id
+              date: activity.date
+              user_agenda_id: agenda id
+              completeness: false
+            )
+        */
         // console.log(agendaID, activityID)
-        knex('user_activities')
-        .where('user_agenda_id', agendaID)
-        .where('activity_id', activityID)
-        .update({'is_complete': is_complete})
-        .then(res.status(200).send())
+        // knex('user_activities')
+        // .where('user_agenda_id', agendaID)
+        // .where('activity_id', activityID)
+        // .update({'is_complete': is_complete})
+        // .then(res.status(200).send())
       })
 
       )
