@@ -117,8 +117,7 @@ class DayActivities extends React.Component{
 
 
   render(){
-    console.log('this.state.date', this.state.date)
-    console.log('formated date', this.state.date.format('YYYY-MM-DD'))
+
     if(this.state.redirect){ //redirect to selected days on calendar
       return (
           <Redirect to={`/${this.state.date.format('YYYY-MM-DD')}/activities`}/>
