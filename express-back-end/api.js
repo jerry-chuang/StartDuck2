@@ -136,16 +136,22 @@ router.delete('/user_activities/:id', (req, res) => {
 //user_agendas#create
 router.post('/user_agendas', (req, res) => {
   console.log(req.body)
-  const {email, start_date, end_date, categories, hours_per_day} = req.body;
+  const {email, categories, hours_per_day} = req.body;
+  let agendaDates = [];
+  let dt = new Date(req.body.start_date)
+  const start_date = new Date(req.body.start_date)
+  const end_date = new Date(req.body.end_date)
+  while (dt<= end_date){// make array of dates that's part of the agenda
+    agendaDates.push(new Date(dt));
+    dt.setDate(dt.getDate() + 1);
+  } 
   knex //find user by email
   .select()
   .table('users')
   .where('email', email)
     .then(results => {
       const userID = results[0].id
-      knex //create new user agenda
-      .select()
-      .table('user_agendas')
+      knex('user_agendas') //create new user agenda
       .insert({
         user_id: userID,
         start_date: start_date,
@@ -154,66 +160,53 @@ router.post('/user_agendas', (req, res) => {
       })
       .then(
         knex //find the created user_agenda id
-      .select('user_agendas.id AS user_agenda_id')
-      .table('user_agendas')
-      .where('user_id', userID)
-      .orderBy('id', 'DESC')
-      .limit('1')
-      .then(results => {
-        const {user_agenda_id} = results[0]; 
-        /*
-          psuedo code for business logic:
-          let unpicked activities = find all activities outer join user_activities where is_complete = false
-          
-          then 
+        .select('user_agendas.id AS user_agenda_id')
+        .table('user_agendas')
+        .where('user_id', userID)
+        .orderBy('id', 'DESC')
+        .limit('1')
+        .then(results => {
+          const {user_agenda_id} = results[0]; 
+          knex('activities')
+          .select('*', 'activities.id AS activity_id')
+          .leftOuterJoin('user_activities', 'activities.id', 'user_activities.activity_id')
+          .then( results=>{
+            let activities = results.filter(activity => !activity.is_complete) // filter for activities that were not completed before
+            let recommended_activities = [];
+            let remove_index = [];
+            //looping through list of dates in agenda
+            for (let date of agendaDates){
+              let day_duration = hours_per_day * 60;
+              while (remove_index.length){
+                activities.splice(remove_index.pop(), 1)
+              }//remove activities that have been chosen already
 
-          let recommended_activities = [];
-          for date of (Array of unique dates){
-            let duration = hours_per_day*60;
-            for (activity of unpicked activities){
-              if activity.duration <= duration{
-                recommedend_activites.push(
-                  activity_id: activity.id,
-                  date: date
-                )
-              duration -= activity.duration
-              if duration <= 0
-              break
+              //looping through list of available activities
+              for (let activity of activities){
+                if(activity.duration <= day_duration){
+                  recommended_activities.push({
+                    activity_id: activity.activity_id,
+                    date: date,
+                    user_agenda_id: user_agenda_id,
+                    is_complete: false
+                  })
+
+                  remove_index.push(activities.indexOf(activity))
+                  day_duration -= activity.duration
+                }
+                if(day_duration <= 0)
+                  break
               }
             }
-          }
-
-          for activity in recommended activities
-            knex(user_activities)
-            .insert(
-              activity_id: activity.activity_id
-              date: activity.date
-              user_agenda_id: agenda id
-              completeness: false
-            )
-        */
-        // console.log(agendaID, activityID)
-        // knex('user_activities')
-        // .where('user_agenda_id', agendaID)
-        // .where('activity_id', activityID)
-        // .update({'is_complete': is_complete})
-        // .then(res.status(200).send())
-      })
-
-      )
-  
+      
+            knex('user_activities')
+            .insert(recommended_activities)
+            .then(res.status(200).send())
+            .catch(error => console.log(error));           
+          })
+        })
+      )  
     })
-   knex('user_agendas')
-      .insert({
-        username: req.body.username,
-        
-      })
-      .then(res.status(200).send())
-      .catch(
-        function(error) {
-          console.error(error);
-        }
-      );
 });
 
 //converting users controller
