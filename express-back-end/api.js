@@ -37,6 +37,7 @@ router.get('/user_activities', (req, res) => {
       .limit('1')
       .then(results => {
         const {id, start_date, end_date} = results[0];
+        console.log('from get request', id, start_date, end_date)
         const agendaID = id;
         let agendaDates = [];
         let dt = new Date(start_date)
@@ -149,64 +150,59 @@ router.post('/user_agendas', (req, res) => {
   .select()
   .table('users')
   .where('email', email)
-    .then(results => {
-      const userID = results[0].id
-      knex('user_agendas') //create new user agenda
-      .insert({
-        user_id: userID,
-        start_date: start_date,
-        end_date: end_date,
-        hours_per_day: hours_per_day,
-      })
-      .then(
-        knex //find the created user_agenda id
-        .select('user_agendas.id AS user_agenda_id')
-        .table('user_agendas')
-        .where('user_id', userID)
-        .orderBy('id', 'DESC')
-        .limit('1')
-        .then(results => {
-          const {user_agenda_id} = results[0]; 
-          knex('activities')
-          .select('*', 'activities.id AS activity_id')
-          .leftOuterJoin('user_activities', 'activities.id', 'user_activities.activity_id')
-          .then( results=>{
-            let activities = results.filter(activity => !activity.is_complete) // filter for activities that were not completed before
-            let recommended_activities = [];
-            let remove_index = [];
-            //looping through list of dates in agenda
-            for (let date of agendaDates){
-              let day_duration = hours_per_day * 60;
-              while (remove_index.length){
-                activities.splice(remove_index.pop(), 1)
-              }//remove activities that have been chosen already
-
-              //looping through list of available activities
-              for (let activity of activities){
-                if(activity.duration <= day_duration){
-                  recommended_activities.push({
-                    activity_id: activity.activity_id,
-                    date: date,
-                    user_agenda_id: user_agenda_id,
-                    is_complete: false
-                  })
-
-                  remove_index.push(activities.indexOf(activity))
-                  day_duration -= activity.duration
-                }
-                if(day_duration <= 0)
-                  break
-              }
-            }
-      
-            knex('user_activities')
-            .insert(recommended_activities)
-            .then(res.status(200).send())
-            .catch(error => console.log(error));           
-          })
-        })
-      )  
+  .then(results => {
+    const userID = results[0].id
+    knex('user_agendas') //create new user agenda
+    .returning('id')
+    .insert({
+      user_id: userID,
+      start_date: start_date,
+      end_date: end_date,
+      hours_per_day: hours_per_day,
     })
+    .then( results => {
+      const user_agenda_id = results[0]; 
+      console.log('the latest agenda id is:', user_agenda_id)
+      knex('activities')
+      .select('*', 'activities.id AS activity_id')
+      .leftOuterJoin('user_activities', 'activities.id', 'user_activities.activity_id')
+      // .whereIn('category_id', categories)
+      .then( results=>{
+        let activities = results.filter(activity => !activity.is_complete) // filter for activities that were not completed before
+        let recommended_activities = [];
+        let remove_index = [];
+        //looping through list of dates in agenda
+        for (let date of agendaDates){
+          let day_duration = hours_per_day * 60;
+          while (remove_index.length){
+            activities.splice(remove_index.pop(), 1)
+          }//remove activities that have been chosen already
+
+          //looping through list of available activities
+          for (let activity of activities){
+            if(activity.duration <= day_duration){
+              recommended_activities.push({
+                activity_id: activity.activity_id,
+                date: date,
+                user_agenda_id: user_agenda_id,
+                is_complete: false
+              })
+
+              remove_index.push(activities.indexOf(activity))
+              day_duration -= activity.duration
+            }
+            if(day_duration <= 0)
+              break
+          }
+        }
+  
+        knex('user_activities')
+        .insert(recommended_activities)
+        .then(res.status(200).send())
+        .catch(error => console.log(error));           
+      })      
+    })  
+  })
 });
 
 //converting users controller
