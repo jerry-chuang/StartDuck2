@@ -31,7 +31,7 @@ class schedule extends React.Component{
       const categories = this.state.categories.map(category =>{
         return( <Checkbox
                  key={ category.id }
-                 value={ category.name }
+                 value={ category.id }
                  onChange={ this.sendSelectedCategories }
                  >
                  { category.name }
