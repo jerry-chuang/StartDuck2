@@ -138,24 +138,20 @@ router.delete('/user_activities/:id', (req, res) => {
 //converting the user_agendas_controller
 //user_agendas#create
 router.post('/user_agendas', (req, res) => {
-  console.log(req.body)
   const {email, categories, hours_per_day} = req.body;
   let agendaDates = [];
   let dt = new Date(req.body.start_date)
   const start_date = new Date(req.body.start_date)
   const end_date = new Date(req.body.end_date)
-  console.log(start_date, end_date)
   while (dt<= end_date){// make array of dates that's part of the agenda
     agendaDates.push(new Date(dt));
     dt.setDate(dt.getDate() + 1);
   } 
-  console.log(agendaDates)
   knex //find user by email
   .select()
   .table('users')
   .where('email', email)
   .then(results => {
-    console.log(Moment(start_date).utc().format('YYYY-MM-DD'))
     const userID = results[0].id
     knex('user_agendas') //create new user agenda
     .returning('id')
@@ -182,8 +178,6 @@ router.post('/user_agendas', (req, res) => {
               activities.push(item);
           }
         }
-        console.log('unique activities', activities)
-
         let recommended_activities = [];
         let remove_index = [];
         //looping through list of dates in agenda
@@ -210,7 +204,6 @@ router.post('/user_agendas', (req, res) => {
               break
           }
         }
-        console.log('recommended',recommended_activities)
         knex('user_activities')
         .insert(recommended_activities)
         .then(res.status(200).send())
@@ -304,29 +297,6 @@ router.post("/admin/categories", (req, res) => {
        }
      );
 });
-  // // insert username to database when put request to /users/
-  // router.post("/", (req, res) => {
-  //   knex('users')
-  //     .insert({username: req.body.username, games_played:0, games_won:0})
-  //     .then(res.status(200).send())
-  //     .catch(
-  //       function(error) {
-  //         console.error(error);
-  //       }
-  //     );
-  // });
-
-  // // on get requests to /users/:username  -> return all data in games table where player1 or player2 = username
-
-  // router.get("/:username", (req, res) => {
-  //   knex('games')
-  //     .select('*')
-  //     .where('player1', req.params.username)
-  //     .orWhere('player2', req.params.username)
-  //     .then((results) => {
-  //       res.json(results);
-  //     });
-  //   });
 
   return router;
 }
