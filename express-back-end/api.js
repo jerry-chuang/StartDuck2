@@ -1,4 +1,5 @@
 "use strict";
+const Moment = require('moment');
 
 const express = require('express');
 const router  = express.Router();
@@ -10,13 +11,13 @@ module.exports = (knex) => {
 //categories#index
 router.get('/categories', (req, res) => {
   knex
-      .select()
-      .table("categories")
-      .then(results => {
-          res.json({
-            categories: results,
-          });
-      });
+    .select()
+    .table("categories")
+    .then(results => {
+        res.json({
+          categories: results,
+        });
+    });
 });
 
 //converting the user_activities_controller from StartDuck
@@ -37,7 +38,7 @@ router.get('/user_activities', (req, res) => {
       .limit('1')
       .then(results => {
         const {id, start_date, end_date} = results[0];
-        console.log('from get request', id, start_date, end_date)
+        // console.log('from get request', id, start_date, end_date)
         const agendaID = id;
         let agendaDates = [];
         let dt = new Date(start_date)
@@ -54,6 +55,7 @@ router.get('/user_activities', (req, res) => {
           .join('categories', 'activities.category_id', 'categories.id')
           .orderBy('user_activities.id', 'DESC')
           .then(results => {
+          
              const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
               .map( category => {
                 return {
@@ -126,11 +128,11 @@ router.patch('/user_activities/:id', (req, res) => {
 router.delete('/user_activities/:id', (req, res) => {
   const {id} = req.params;
   knex
-      .select()
-      .table("user_activities")
-      .where('id', id)
-      .del()
-      .then(res.status(200).send());
+    .select()
+    .table("user_activities")
+    .where('id', id)
+    .del()
+    .then(res.status(200).send());
 });
 
 //converting the user_agendas_controller
@@ -142,33 +144,46 @@ router.post('/user_agendas', (req, res) => {
   let dt = new Date(req.body.start_date)
   const start_date = new Date(req.body.start_date)
   const end_date = new Date(req.body.end_date)
+  console.log(start_date, end_date)
   while (dt<= end_date){// make array of dates that's part of the agenda
     agendaDates.push(new Date(dt));
     dt.setDate(dt.getDate() + 1);
   } 
+  console.log(agendaDates)
   knex //find user by email
   .select()
   .table('users')
   .where('email', email)
   .then(results => {
+    console.log(Moment(start_date).utc().format('YYYY-MM-DD'))
     const userID = results[0].id
     knex('user_agendas') //create new user agenda
     .returning('id')
     .insert({
       user_id: userID,
-      start_date: start_date,
-      end_date: end_date,
+      start_date: Moment(start_date).utc().format('YYYY-MM-DD'),
+      end_date: Moment(end_date).utc().format('YYYY-MM-DD'),
       hours_per_day: hours_per_day,
     })
     .then( results => {
       const user_agenda_id = results[0]; 
-      console.log('the latest agenda id is:', user_agenda_id)
       knex('activities')
       .select('*', 'activities.id AS activity_id')
+      .whereIn('category_id', categories)
       .leftOuterJoin('user_activities', 'activities.id', 'user_activities.activity_id')
-      // .whereIn('category_id', categories)
       .then( results=>{
-        let activities = results.filter(activity => !activity.is_complete) // filter for activities that were not completed before
+        let old_activities = results.filter(activity => !activity.is_complete) // filter for activities that were not completed before
+        // need to filter for user_activities with identical activity_id since currently we're always creating new user_activities
+        const activities = [];
+        const map = new Map();
+        for (let item of old_activities) {
+          if(!map.has(item.activity_id)){
+              map.set(item.activity_id, true);    // set any value to Map
+              activities.push(item);
+          }
+        }
+        console.log('unique activities', activities)
+
         let recommended_activities = [];
         let remove_index = [];
         //looping through list of dates in agenda
@@ -183,7 +198,7 @@ router.post('/user_agendas', (req, res) => {
             if(activity.duration <= day_duration){
               recommended_activities.push({
                 activity_id: activity.activity_id,
-                date: date,
+                date: Moment(date).utc(),
                 user_agenda_id: user_agenda_id,
                 is_complete: false
               })
@@ -195,7 +210,7 @@ router.post('/user_agendas', (req, res) => {
               break
           }
         }
-  
+        console.log('recommended',recommended_activities)
         knex('user_activities')
         .insert(recommended_activities)
         .then(res.status(200).send())
