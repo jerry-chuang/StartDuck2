@@ -290,11 +290,8 @@ router.get('/admin/activities/:id', (req, res) => {
       });
 });
 // admin/activities#destroy
-router.delete('/admin/activities:id', (req, res) => res.json({
-  message: "Seems to work!",
-}));
-
-router.delete('/admin/activities:id', (req, res) => {
+router.delete('/admin/activities/:id', (req, res) => {
+  console.log(req.body, req.query, req.params)
   const {id} = req.params;
   knex
     .select()
