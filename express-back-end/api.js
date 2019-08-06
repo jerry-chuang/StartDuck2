@@ -305,9 +305,16 @@ router.patch('/admin/activities/:id', (req, res) => res.json({
 
 //converting admin/categories controller
 // admin/categories#index
-router.get('/admin/categories', (req, res) => res.json({
-  message: "Seems to work!",
-}));
+router.get('/admin/categories', (req, res) => {
+  knex
+      .select()
+      .table("categories")
+      .then(results => {
+          res.json({
+            categories: results,
+          });
+      });
+});
 // admin/categories#destroy
 router.delete('/admin/categories:id', (req, res) => res.json({
   message: "Seems to work!",
