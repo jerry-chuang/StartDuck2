@@ -26,9 +26,11 @@ App.use(Express.static('public'));
 //   };
 //   App.use(allowCrossDomain);
 
-const apiRoutes = require("./api.js");
+const apiRoutes = require("./api/api.js");
+const categoriesRoutes = require('./api/categories.js')
 
 App.use("/api", apiRoutes(knex));
+App.use('/api/categories', categoriesRoutes(knex))
 
 App.listen(PORT, () => {
   // eslint-disable-next-line no-console

@@ -9,16 +9,16 @@ module.exports = (knex) => {
  
 //converting the categories controller from StartDuck
 //categories#index
-router.get('/categories', (req, res) => {
-  knex
-    .select()
-    .table("categories")
-    .then(results => {
-        res.json({
-          categories: results,
-        });
-    });
-});
+// router.get('/categories', (req, res) => {
+//   knex
+//     .select()
+//     .table("categories")
+//     .then(results => {
+//         res.json({
+//           categories: results,
+//         });
+//     });
+// });
 
 //converting the user_activities_controller from StartDuck
 //user_activities#index
@@ -241,29 +241,28 @@ router.get('/users/:id', (req, res) => {
   .then(results => {
     const userID = results[0].id
     knex
-      .select()
-      .table('user_agendas')
-      .join('user_activities', 'user_agendas.id', 'user_activities.user_agenda_id')
-      .join('activities','user_activities.activity_id', 'activities.id' )
-      .where('user_agendas.user_id', userID)
-      .where('is_complete', true)
-      .then(results => {
+    .select()
+    .table('user_agendas')
+    .join('user_activities', 'user_agendas.id', 'user_activities.user_agenda_id')
+    .join('activities','user_activities.activity_id', 'activities.id' )
+    .where('user_agendas.user_id', userID)
+    .where('is_complete', true)
+    .then(results => {
 
-        const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
-              .map( category => {
-                return {
-                  id: results.find(item => item.categories  === category).id,
-                  name: category
-                }
-              });
-        
-          res.json({
-            activities: results,
-            categories: categories
-          });
-      });
+      const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
+            .map( category => {
+              return {
+                id: results.find(item => item.categories  === category).id,
+                name: category
+              }
+            });
+      
+        res.json({
+          activities: results,
+          categories: categories
+        });
+    });
   })
-  
 });
 
 //converting admin/activities controller
@@ -355,7 +354,6 @@ router.delete('/admin/categories/:id', (req, res) => {
 });
 // admin/categories#create
 router.post("/admin/categories", (req, res) => {
-  console.log("req for users#create", req)
    knex('categories')
      .insert({name: req.body.name})
      .then(res.status(200).send())
@@ -365,6 +363,5 @@ router.post("/admin/categories", (req, res) => {
        }
      );
 });
-
   return router;
 }
