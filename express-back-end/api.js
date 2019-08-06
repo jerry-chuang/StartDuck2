@@ -285,7 +285,7 @@ router.get('/admin/activities/:id', (req, res) => {
       .where('id', req.params.id)
       .then(results => {
           res.json({
-            activity: results,
+            activity: results[0],
           });
       });
 });
