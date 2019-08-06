@@ -38,7 +38,6 @@ router.get('/user_activities', (req, res) => {
       .limit('1')
       .then(results => {
         const {id, start_date, end_date} = results[0];
-        // console.log('from get request', id, start_date, end_date)
         const agendaID = id;
         let agendaDates = [];
         let dt = new Date(start_date)
@@ -77,7 +76,6 @@ router.get('/user_activities', (req, res) => {
 
 //user_activities#show
 router.get('/user_activities/:id', (req, res) => {
-  // console.log('activity get req', req.body)
   const {user_activity_id} = req.query;
   knex
     .select()
@@ -94,7 +92,6 @@ router.get('/user_activities/:id', (req, res) => {
 //TODO: Implement validations so user_activities and activities can be 1 to 1
 //currently directly converting old logic
 router.patch('/user_activities/:id', (req, res) => {
-  console.log('req.body', req.body)
   const {email, is_complete} = req.body;
   const {id} = req.params;
   const activityID = id;
@@ -113,7 +110,6 @@ router.patch('/user_activities/:id', (req, res) => {
       .then(results => {
         const {id} = results[0];
         const agendaID = id;
-        // console.log(agendaID, activityID)
         knex('user_activities')
         .where('user_agenda_id', agendaID)
         .where('activity_id', activityID)
@@ -216,14 +212,13 @@ router.post('/user_agendas', (req, res) => {
 //converting users controller
 //users#create
  router.post("/users", (req, res) => {
-   console.log("req for users#create", req.body)
+
     knex('users')
       .select('email')
       .where('email', req.body.email)
       .then(res.status(200).send())
       .catch(
         error => {
-          console.log(error)
           knex('users')
           .insert({email: req.body.email})
           .then(res.status(200).send())
@@ -238,15 +233,37 @@ router.post('/user_agendas', (req, res) => {
   });
 //users#show
 router.get('/users/:id', (req, res) => {
-  knex
+  const {email} = req.query
+  knex //find user by email
+  .select()
+  .table('users')
+  .where('email', email)
+  .then(results => {
+    const userID = results[0].id
+    knex
       .select()
-      .table("users")
+      .table('user_agendas')
+      .join('user_activities', 'user_agendas.id', 'user_activities.user_agenda_id')
+      .join('activities','user_activities.activity_id', 'activities.id' )
+      .where('user_agendas.user_id', userID)
+      .where('is_complete', true)
       .then(results => {
-        console.log(results)
+
+        const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
+              .map( category => {
+                return {
+                  id: results.find(item => item.categories  === category).id,
+                  name: category
+                }
+              });
+        
           res.json({
-            results: results,
+            activities: results,
+            categories: categories
           });
       });
+  })
+  
 });
 
 //converting admin/activities controller
