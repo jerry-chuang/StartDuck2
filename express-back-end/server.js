@@ -28,9 +28,12 @@ App.use(Express.static('public'));
 
 const apiRoutes = require("./api/api.js");
 const categoriesRoutes = require('./api/categories.js')
+const userActivitiesRoutes = require('./api/user_activities.js')
 
 App.use("/api", apiRoutes(knex));
 App.use('/api/categories', categoriesRoutes(knex))
+App.use('/api/user_activities', userActivitiesRoutes(knex))
+
 
 App.listen(PORT, () => {
   // eslint-disable-next-line no-console

@@ -20,116 +20,116 @@ module.exports = (knex) => {
 //     });
 // });
 
-//converting the user_activities_controller from StartDuck
-//user_activities#index
-router.get('/user_activities', (req, res) => {
-  const {email, date} = req.query
-  knex //find user by email
-  .select()
-  .table("users")
-  .where('email', email)
-  .then(results => {
-    const userID = results[0].id
-    knex //find most recent user_agenda
-      .select()
-      .table("user_agendas")
-      .where('user_id', userID)
-      .orderBy('id', 'DESC')
-      .limit('1')
-      .then(results => {
-        const {id, start_date, end_date} = results[0];
-        const agendaID = id;
-        let agendaDates = [];
-        let dt = new Date(start_date)
-        while (dt<= end_date){ // make array of dates that's part of the agenda
-          agendaDates.push(new Date(dt));
-          dt.setDate(dt.getDate() + 1);
-        } 
-        knex //find user_activities that's part of the agenda
-          .select('*', 'activities.name AS name', 'categories.name AS categories', 'user_activities.id AS user_activitiy_id')
-          .table("user_activities")
-          .where('user_agenda_id', agendaID)
-          .where('date', date)
-          .join('activities', 'user_activities.activity_id', 'activities.id')
-          .join('categories', 'activities.category_id', 'categories.id')
-          .orderBy('user_activities.id', 'DESC')
-          .then(results => {
+// //converting the user_activities_controller from StartDuck
+// //user_activities#index
+// router.get('/user_activities', (req, res) => {
+//   const {email, date} = req.query
+//   knex //find user by email
+//   .select()
+//   .table("users")
+//   .where('email', email)
+//   .then(results => {
+//     const userID = results[0].id
+//     knex //find most recent user_agenda
+//       .select()
+//       .table("user_agendas")
+//       .where('user_id', userID)
+//       .orderBy('id', 'DESC')
+//       .limit('1')
+//       .then(results => {
+//         const {id, start_date, end_date} = results[0];
+//         const agendaID = id;
+//         let agendaDates = [];
+//         let dt = new Date(start_date)
+//         while (dt<= end_date){ // make array of dates that's part of the agenda
+//           agendaDates.push(new Date(dt));
+//           dt.setDate(dt.getDate() + 1);
+//         } 
+//         knex //find user_activities that's part of the agenda
+//           .select('*', 'activities.name AS name', 'categories.name AS categories', 'user_activities.id AS user_activitiy_id')
+//           .table("user_activities")
+//           .where('user_agenda_id', agendaID)
+//           .where('date', date)
+//           .join('activities', 'user_activities.activity_id', 'activities.id')
+//           .join('categories', 'activities.category_id', 'categories.id')
+//           .orderBy('user_activities.id', 'DESC')
+//           .then(results => {
           
-             const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
-              .map( category => {
-                return {
-                  id: results.find(item => item.categories  === category).id,
-                  name: category
-                }
-              }); 
+//              const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
+//               .map( category => {
+//                 return {
+//                   id: results.find(item => item.categories  === category).id,
+//                   name: category
+//                 }
+//               }); 
         
-            res.json({
-              activities: results,
-              categories: categories,
-              agenda: agendaDates,
-            });        
-          });
-      });
-  });
+//             res.json({
+//               activities: results,
+//               categories: categories,
+//               agenda: agendaDates,
+//             });        
+//           });
+//       });
+//   });
   
-});
+// });
 
-//user_activities#show
-router.get('/user_activities/:id', (req, res) => {
-  const {user_activity_id} = req.query;
-  knex
-    .select()
-    .table('user_activities')
-    .where('user_activities.id', user_activity_id)
-    .join('activities','user_activities.activity_id', 'activities.id' )
-    .then(results =>{
-      res.json({
-        activity: results[0]
-      })
-    })
-});
-//user_activities#update
-//TODO: Implement validations so user_activities and activities can be 1 to 1
-//currently directly converting old logic
-router.patch('/user_activities/:id', (req, res) => {
-  const {email, is_complete} = req.body;
-  const {id} = req.params;
-  const activityID = id;
-  knex //find user by email
-  .select()
-  .table('users')
-  .where('email', email)
-    .then(results => {
-      const userID = results[0].id
-      knex //find most recent user_agenda
-      .select()
-      .table('user_agendas')
-      .where('user_id', userID)
-      .orderBy('id', 'DESC')
-      .limit('1')
-      .then(results => {
-        const {id} = results[0];
-        const agendaID = id;
-        knex('user_activities')
-        .where('user_agenda_id', agendaID)
-        .where('activity_id', activityID)
-        .update({'is_complete': is_complete})
-        .then(res.status(200).send())
-      })
-    })
-});
+// //user_activities#show
+// router.get('/user_activities/:id', (req, res) => {
+//   const {user_activity_id} = req.query;
+//   knex
+//     .select()
+//     .table('user_activities')
+//     .where('user_activities.id', user_activity_id)
+//     .join('activities','user_activities.activity_id', 'activities.id' )
+//     .then(results =>{
+//       res.json({
+//         activity: results[0]
+//       })
+//     })
+// });
+// //user_activities#update
+// //TODO: Implement validations so user_activities and activities can be 1 to 1
+// //currently directly converting old logic
+// router.patch('/user_activities/:id', (req, res) => {
+//   const {email, is_complete} = req.body;
+//   const {id} = req.params;
+//   const activityID = id;
+//   knex //find user by email
+//   .select()
+//   .table('users')
+//   .where('email', email)
+//     .then(results => {
+//       const userID = results[0].id
+//       knex //find most recent user_agenda
+//       .select()
+//       .table('user_agendas')
+//       .where('user_id', userID)
+//       .orderBy('id', 'DESC')
+//       .limit('1')
+//       .then(results => {
+//         const {id} = results[0];
+//         const agendaID = id;
+//         knex('user_activities')
+//         .where('user_agenda_id', agendaID)
+//         .where('activity_id', activityID)
+//         .update({'is_complete': is_complete})
+//         .then(res.status(200).send())
+//       })
+//     })
+// });
 
 
-//user_activities#destroy
-router.delete('/user_activities/:id', (req, res) => {
-  const {id} = req.params;
-  knex
-    .select()
-    .table("user_activities")
-    .where('id', id)
-    .del()
-    .then(res.status(200).send());
-});
+// //user_activities#destroy
+// router.delete('/user_activities/:id', (req, res) => {
+//   const {id} = req.params;
+//   knex
+//     .select()
+//     .table("user_activities")
+//     .where('id', id)
+//     .del()
+//     .then(res.status(200).send());
+// });
 
 //converting the user_agendas_controller
 //user_agendas#create
