@@ -216,15 +216,25 @@ router.post('/user_agendas', (req, res) => {
 //converting users controller
 //users#create
  router.post("/users", (req, res) => {
-   console.log("req for users#create", req)
+   console.log("req for users#create", req.body)
     knex('users')
-      .insert({email: req.body.email})
+      .select('email')
+      .where('email', req.body.email)
       .then(res.status(200).send())
       .catch(
-        function(error) {
-          console.error(error);
+        error => {
+          console.log(error)
+          knex('users')
+          .insert({email: req.body.email})
+          .then(res.status(200).send())
+          .catch(
+            function(error) {
+              console.error(error);
+            }
+          )
         }
-      );
+        
+      )
   });
 //users#show
 router.get('/users/:id', (req, res) => {
