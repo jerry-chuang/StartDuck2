@@ -291,7 +291,6 @@ router.get('/admin/activities/:id', (req, res) => {
 });
 // admin/activities#destroy
 router.delete('/admin/activities/:id', (req, res) => {
-  console.log(req.body, req.query, req.params)
   const {id} = req.params;
   knex
     .select()
@@ -302,9 +301,7 @@ router.delete('/admin/activities/:id', (req, res) => {
 });
 // admin/activities#create
 router.post('/admin/activities', (req, res) => {
-
   const {name, content, duration, category} = req.body;
-  
   knex('activities')
     .insert({
       category_id: category,
@@ -315,8 +312,6 @@ router.post('/admin/activities', (req, res) => {
     .then(res.status(200).send())
     .catch(error => console.log(error))
 });
-
-knex
 
 // admin/activities#update
 router.patch('/admin/activities/:id', (req, res) => {
@@ -349,9 +344,15 @@ router.get('/admin/categories', (req, res) => {
       });
 });
 // admin/categories#destroy
-router.delete('/admin/categories:id', (req, res) => res.json({
-  message: "Seems to work!",
-}));
+router.delete('/admin/categories/:id', (req, res) => {
+  const {id} = req.params;
+  knex
+    .select()
+    .table("categories")
+    .where('id', id)
+    .del()
+    .then(res.status(200).send());
+});
 // admin/categories#create
 router.post("/admin/categories", (req, res) => {
   console.log("req for users#create", req)
