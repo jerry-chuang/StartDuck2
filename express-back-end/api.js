@@ -319,9 +319,21 @@ router.post('/admin/activities', (req, res) => {
 knex
 
 // admin/activities#update
-router.patch('/admin/activities/:id', (req, res) => res.json({
-  message: "Seems to work!",
-}));
+router.patch('/admin/activities/:id', (req, res) => {
+  const {name, content, duration, category} = req.body;
+  const {id} = req.params;
+  knex
+  .select()
+  .table('activities')
+  .where('id', id)
+  .update({
+    'name': name,
+    'content': content,
+    'duration': duration,
+    'category_id': category,
+  })
+  .then(res.status(200).send())
+});
 
 
 //converting admin/categories controller
