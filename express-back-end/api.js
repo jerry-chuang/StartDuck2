@@ -293,10 +293,34 @@ router.get('/admin/activities/:id', (req, res) => {
 router.delete('/admin/activities:id', (req, res) => res.json({
   message: "Seems to work!",
 }));
+
+router.delete('/admin/activities:id', (req, res) => {
+  const {id} = req.params;
+  knex
+    .select()
+    .table("activities")
+    .where('id', id)
+    .del()
+    .then(res.status(200).send());
+});
 // admin/activities#create
-router.post('/admin/activities', (req, res) => res.json({
-  message: "Seems to work!",
-}));
+router.post('/admin/activities', (req, res) => {
+
+  const {name, content, duration, category} = req.body;
+  
+  knex('activities')
+    .insert({
+      category_id: category,
+      content: content,
+      name: name,
+      duration: duration,
+    })
+    .then(res.status(200).send())
+    .catch(error => console.log(error))
+});
+
+knex
+
 // admin/activities#update
 router.patch('/admin/activities/:id', (req, res) => res.json({
   message: "Seems to work!",
