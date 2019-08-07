@@ -26,19 +26,21 @@ App.use(Express.static('public'));
 //   };
 //   App.use(allowCrossDomain);
 
-const apiRoutes = require("./api/api.js");
+// const apiRoutes = require("./api/api.js");
 const categoriesRoutes = require('./api/categories.js')
 const userActivitiesRoutes = require('./api/user_activities.js')
 const userAgendasRoutes = require('./api/user_agendas.js')
 const usersRoutes = require('./api/users.js')
 const adminActivitiesRoutes = require('./api/admin/activities.js')
+const adminCategoriesRoutes = require('./api/admin/categories.js')
 
-App.use("/api", apiRoutes(knex));
+// App.use("/api", apiRoutes(knex));
 App.use('/api/categories', categoriesRoutes(knex))
 App.use('/api/user_activities', userActivitiesRoutes(knex))
 App.use('/api/user_agendas', userAgendasRoutes(knex))
 App.use('/api/users', usersRoutes(knex))
 App.use('/api/admin/activities', adminActivitiesRoutes(knex))
+App.use('/api/admin/categories', adminCategoriesRoutes(knex))
 
 
 App.listen(PORT, () => {
