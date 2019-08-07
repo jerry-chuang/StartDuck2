@@ -7,13 +7,11 @@ module.exports = (knex) => {
   //converting the user_activities_controller from StartDuck
   //user_activities#index
   router.get('/', (req, res) => {
-    console.log('req.query', req.query)
     const {email, date} = req.query
     knex('users') //find user by email
     .select('*')
     .where('email', email)
     .then(results => {
-      console.log('results for email search', results)
       const userID = results[0].id
       knex('user_agendas') //find most recent user_agenda
       .select('*')
