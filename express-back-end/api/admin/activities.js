@@ -4,7 +4,7 @@ const express = require('express');
 const router  = express.Router();
 
 module.exports = (knex) => { 
-  //converting admin/activities controller
+  //converting admin/activities controller from StartDuck
   // admin/activities#index
   router.get('/', (req, res) => {
     knex
@@ -69,5 +69,3 @@ module.exports = (knex) => {
   
   return router;
 }
-
-

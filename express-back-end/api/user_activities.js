@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const express = require('express');
 const router  = express.Router();
@@ -70,10 +70,8 @@ module.exports = (knex) => {
   //user_activities#update
   //TODO: Implement validations so user_activities and activities can be 1 to 1
   router.patch('/:id', (req, res) => {
-
     const {is_complete} = req.body;
     const {id} = req.params;
-
     knex('user_activities')
     .where('id', id)
     .update({'is_complete': is_complete})

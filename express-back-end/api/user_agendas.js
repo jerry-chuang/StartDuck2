@@ -36,12 +36,12 @@ module.exports = (knex) => {
         .leftOuterJoin('user_activities', 'activities.id', 'user_activities.activity_id')
         .then( results=>{
           let old_activities = results.filter(activity => !activity.is_complete) // filter for activities that were not completed before
-          // need to filter for user_activities with identical activity_id since currently we're always creating new user_activities
+          // Filter for user_activities with identical activity_id since currently we're always creating new user_activities
           const activities = [];
           const map = new Map();
           for (let item of old_activities) {
             if(!map.has(item.activity_id)){
-                map.set(item.activity_id, true);    // set any value to Map
+                map.set(item.activity_id, true);
                 activities.push(item);
             }
           }

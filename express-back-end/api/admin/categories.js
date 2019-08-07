@@ -4,7 +4,7 @@ const express = require('express');
 const router  = express.Router();
 
 module.exports = (knex) => { 
-  //converting admin/categories controller
+  //converting admin/categories controller from StartDuck
   // admin/categories#index
   router.get('/', (req, res) => {
     knex('categories')
