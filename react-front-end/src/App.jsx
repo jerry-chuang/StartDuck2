@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import React, {useState} from 'react';
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import 'antd/dist/antd.css';
 import Cookies from 'universal-cookie';
 
@@ -16,79 +16,54 @@ import AdminActivity from "./components/admin/AdminActivity.jsx";
 
 const cookies = new Cookies()
 
-class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      email: cookies.get('email'),
-    }
-  }
+function App(){
+  const [user, setUser] = useState(cookies.get('email'))
 
-  setUser = (email) => {
-    this.setState({ email: email }, () => console.log('current state after setting user', this.state))
-  }
-
-  render() {
-
-    return (
-      <Router>
-        <Nav cookies={cookies} setUser={this.setUser} setRedirect={this.setRedirect} />
-
-        <main className="main-container">
-          <Switch>
-
-            <Route
-            path="/admin/activities/:id"
-            render={(props) => <AdminActivity {...props} activity={this.state.activity} params={props.match.params}/>}
-            />
-
-            <Route
-            path="/admin/activities"
-            render={(props) => <AdminActivities {...props} activities={this.state.activities} params={props.match.params}/>}
-            />
-
-            <Route
-              path="/admin/categories"
-              render={(props) => <AdminCategories {...props} categories={this.state.categories} params={props.match.params}/>}
-            />
-
-            <Route
-              path="/:day/activities/:activityID"
-              render={(props) => {
-                return <TodayActivity {...props} cookies={cookies} activities={this.state.activities} params={props.match.params} />
-              }
-              } />
-            <Route
-              path="/schedule"
-              render={(props) => <DatePicker {...props} cookies={cookies} state={this.state} />}
-            />
-
-            <Route
-              path="/:day/activities/"
-              render={(props) => <DayActivities {...props} cookies={cookies} params={props.match.params} />}
-            />
-              <Route
-              path="/completed_activities/:id"
-              render={(props) => {
-                return <CompletedActivityContent {...props} cookies={cookies} activities={this.state.activities} params={props.match.params} />}
-              }/>
-              <Route
-                path="/completed_activities"
-                render={(props) => {
-                return <CompletedActivities {...props} params={props.match.params} setUser={this.setUser} cookies={cookies} />}
-
-                }/>
-
-            <Route
-              path="/"
-              render={(props) => <Login {...props} setUser={this.setUser} cookies={cookies} />}
-            />
-          </Switch>
-        </main>
-      </Router>
-    );
-
-  }
+  return (
+    <Router>
+      <Nav cookies={cookies} setUser={setUser}/>
+      <main className="main-container">
+        <Switch>
+          <Route
+          path="/admin/activities/:id"
+          render={(props) => <AdminActivity {...props} params={props.match.params}/>}
+          />
+          <Route
+          path="/admin/activities"
+          render={(props) => <AdminActivities {...props}/>}
+          />
+          <Route
+            path="/admin/categories"
+            render={(props) => <AdminCategories {...props}/>}
+          />
+          <Route
+            path="/:day/activities/:activityID"
+            render={(props) => <TodayActivity {...props} cookies={cookies} params={props.match.params} />}
+          />
+          <Route
+            path="/schedule"
+            render={(props) => <DatePicker {...props} cookies={cookies} />}
+          />
+          <Route
+            path="/:day/activities/"
+            render={(props) => <DayActivities {...props} cookies={cookies} params={props.match.params} />}
+          />
+          <Route
+          path="/completed_activities/:id"
+          render={(props) => <CompletedActivityContent {...props} cookies={cookies} params={props.match.params} />}
+          />
+          <Route
+            path="/completed_activities"
+            render={(props) => <CompletedActivities {...props} cookies={cookies} />}
+          />
+          <Route
+            path="/"
+            render={(props) => <Login {...props} setUser={setUser} cookies={cookies} />}
+          />
+        </Switch>
+      </main>
+    </Router>
+  );
 }
 
 export default App;
