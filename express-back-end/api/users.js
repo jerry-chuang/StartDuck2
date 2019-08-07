@@ -10,16 +10,20 @@ module.exports = (knex) => {
     knex('users')
     .select('email')
     .where('email', req.body.email)
-    .then(res.status(200).send())
-    .catch(error => {
-      knex('users')
-      .insert({email: req.body.email})
-      .then(res.status(200).send())
-      .catch(error => {
-        console.error(error);
-      })
+    .then(results =>{
+      if (!results[0]){
+        knex('users')
+        .insert({email: req.body.email})
+        .then(res.status(200).send())
+        .catch(error => {
+          console.error(error);
+        })
+      } else {
+        res.status(200).send()
+      }
     })
   });
+
   //users#show
   router.get('/:id', (req, res) => {
     const {email} = req.query

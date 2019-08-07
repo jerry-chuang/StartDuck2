@@ -8,29 +8,22 @@ import axios from 'axios';
 
 class Login extends Component {
 
-  state = {
-    redirect: false
-  }
-  componentDidUpdate(){
-    if (this.state.redirect){
-      this.setState({redirect:false})
-    }
-  }
-
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.props.cookies.set("email", values.email, { path: '/' })
-        this.props.setUser(this.props.cookies.get('email'))
-        this.setState({redirect:true})
-        axios.post('/api/users', {email: this.props.cookies.get('email')})
+        axios
+        .post('/api/users', {email: values.email})
+        .then(results => {
+          this.props.cookies.set("email", values.email, { path: '/' })
+          this.props.setUser(this.props.cookies.get('email'))  
+        })  
       }
     });
   };
 
   render() {
-    if(this.state.redirect || this.props.cookies.get('email')){
+    if(this.props.cookies.get('email')){
       return (
           <Redirect to={`/${moment().format('YYYY-MM-DD')}/activities`}/>
       )
