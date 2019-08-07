@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-// import { ReactComponent as MainImage } from './images/main.svg';
-import main from './images/main.png'
+// import { ReactComponent as MainImage } from '../images/main.svg';
+import main from '../images/main.png'
 import { Form, Icon, Input, Button} from 'antd';
 import {Redirect} from "react-router-dom";
 import * as moment from 'moment';

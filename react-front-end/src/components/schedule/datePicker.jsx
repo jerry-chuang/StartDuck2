@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, DatePicker, Button} from 'antd';
 import TimePicker123 from './TimePicker.jsx';
-import Schedule from './schedule.jsx';
+import Schedule from './Schedule.jsx';
 import axios from 'axios';
 import { Redirect } from 'react-router'
 import * as moment from 'moment';

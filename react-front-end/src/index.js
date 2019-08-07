@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 // import { DatePicker, message } from 'antd';
 // import 'antd/dist/antd.css';
 import './css/index.css';
-import App from './App';
+import App from './App.jsx';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'));

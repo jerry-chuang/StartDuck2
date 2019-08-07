@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import TodayActivityBox from './TodayActivityBox.jsx';
+import TodayActivityBox from '../activity/TodayActivityBox.jsx';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 

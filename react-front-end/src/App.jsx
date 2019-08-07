@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
-import './App.css';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import 'antd/dist/antd.css';
 import Cookies from 'universal-cookie';
-import Nav from './Nav.jsx';
-import Login from './Login.jsx'
-import DayActivities from "./dayActivities.jsx";
-import DatePicker from "./datePicker.jsx";
-import TodayActivity from "./TodayActivity.jsx";
-import CompletedActivities from './CompletedActivities.jsx'
-import CompletedActivityContent from './CompletedActivityContent.jsx'
-import AdminCategories from "./AdminCategories.jsx";
-import AdminActivities from "./AdminActivities.jsx";
-import AdminActivity from "./AdminActivity.jsx";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
+import Nav from './components/Nav.jsx';
+import Login from './components/Login.jsx'
+import DayActivities from "./components/activities/DayActivities.jsx";
+import DatePicker from "./components/schedule/datePicker.jsx";
+import TodayActivity from "./components/activity/TodayActivity.jsx";
+import CompletedActivities from './components/completeActivities/CompletedActivities.jsx'
+import CompletedActivityContent from './components/completeActivities/CompletedActivityContent.jsx'
+import AdminCategories from "./components/admin/AdminCategories.jsx";
+import AdminActivities from "./components/admin/AdminActivities.jsx";
+import AdminActivity from "./components/admin/AdminActivity.jsx";
 
 const cookies = new Cookies()
 
