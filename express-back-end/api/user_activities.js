@@ -7,11 +7,13 @@ module.exports = (knex) => {
   //converting the user_activities_controller from StartDuck
   //user_activities#index
   router.get('/', (req, res) => {
+    console.log('req.query', req.query)
     const {email, date} = req.query
     knex('users') //find user by email
     .select('*')
     .where('email', email)
     .then(results => {
+      console.log('results for email search', results)
       const userID = results[0].id
       knex('user_agendas') //find most recent user_agenda
       .select('*')
@@ -19,38 +21,48 @@ module.exports = (knex) => {
       .orderBy('id', 'DESC')
       .limit('1')
       .then(results => {
-        const {id, start_date, end_date} = results[0];
-        const agendaID = id;
-        let agendaDates = [];
-        let dt = new Date(start_date)
-        while (dt<= end_date){ // make array of dates that's part of the agenda
-          agendaDates.push(new Date(dt));
-          dt.setDate(dt.getDate() + 1);
-        } 
-        knex('user_activities') //find user_activities that's part of the agenda
-        .join('activities', 'user_activities.activity_id', 'activities.id')
-        .join('categories', 'activities.category_id', 'categories.id')
-        .select('*', 'activities.name AS name', 'categories.name AS categories', 'user_activities.id AS user_activitiy_id')
-        .where('user_agenda_id', agendaID)
-        .where('date', date)
-        .orderBy('user_activities.id', 'DESC')
-        .then(results => {
-          const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
-            .map( category => {
-              return {
-                id: results.find(item => item.categories  === category).id,
-                name: category
-              }
-            }); 
-      
+        if (results[0]){ 
+          const {id, start_date, end_date} = results[0];
+          const agendaID = id;
+          let agendaDates = [];
+          let dt = new Date(start_date)
+          while (dt<= end_date){ // make array of dates that's part of the agenda
+            agendaDates.push(new Date(dt));
+            dt.setDate(dt.getDate() + 1);
+          } 
+          knex('user_activities') //find user_activities that's part of the agenda
+          .join('activities', 'user_activities.activity_id', 'activities.id')
+          .join('categories', 'activities.category_id', 'categories.id')
+          .select('*', 'activities.name AS name', 'categories.name AS categories', 'user_activities.id AS user_activitiy_id')
+          .where('user_agenda_id', agendaID)
+          .where('date', date)
+          .orderBy('user_activities.id', 'DESC')
+          .then(results => {
+            const categories = Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
+              .map( category => {
+                return {
+                  id: results.find(item => item.categories  === category).id,
+                  name: category
+                }
+              }); 
+        
+            res.json({
+              activities: results,
+              categories: categories,
+              agenda: agendaDates,
+            });        
+          });
+        } else { //if no agenda found, must be first time user, respond with empty object
           res.json({
-            activities: results,
-            categories: categories,
-            agenda: agendaDates,
-          });        
-        });
+            activities: [],
+            categories: [],
+            agenda: [],
+          })
+        }
       });
-    });
+    })
+    .catch(error => {console.error(error); })
+    ;
   });
 
   //user_activities#show
