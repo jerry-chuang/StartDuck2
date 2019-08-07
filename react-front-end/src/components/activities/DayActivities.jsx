@@ -54,12 +54,7 @@ class DayActivities extends React.Component{
         categories: response.data.categories,
         agenda: response.data.agenda,
       });
-    })
-    .catch((error) => {
-      if (error) {
-        console.log(error)
-        this.checkFirstTimeUser();
-      }
+      this.checkFirstTimeUser();
     })
   }
 
