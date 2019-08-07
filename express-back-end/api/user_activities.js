@@ -70,29 +70,15 @@ module.exports = (knex) => {
   //user_activities#update
   //TODO: Implement validations so user_activities and activities can be 1 to 1
   router.patch('/:id', (req, res) => {
-    const {email, is_complete} = req.body;
+
+    const {is_complete} = req.body;
     const {id} = req.params;
-    const activityID = id;
-    knex('users') //find user by email
-    .select('*')
-    .where('email', email)
-    .then(results => {
-      const userID = results[0].id
-      knex('user_agendas') //find most recent user_agenda
-      .select('*')
-      .where('user_id', userID)
-      .orderBy('id', 'DESC')
-      .limit('1')
-      .then(results => {
-        const {id} = results[0];
-        const agendaID = id;
-        knex('user_activities')
-        .where('user_agenda_id', agendaID)
-        .where('activity_id', activityID)
-        .update({'is_complete': is_complete})
-        .then(res.status(200).send())
-      })
-    })
+
+    knex('user_activities')
+    .where('id', id)
+    .update({'is_complete': is_complete})
+    .then(res.status(200).send())
+
   });
 
   //user_activities#destroy
