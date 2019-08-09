@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TodayActivityBox from './TodayActivityBox.jsx';
 import TodayActivityCalendar from './TodayActivityCalendar.jsx';
 import { Redirect } from "react-router-dom";
@@ -8,168 +8,143 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import * as moment from 'moment';
 
-class TodayActivity extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      active: false,
-      activities: [],
-      activity: {},
-      categories: [],
-      email: this.props.cookies.get('email'),
-      agenda: [],
-      date: this.props.params.day,
-    };
-  }
+function  TodayActivity(props) {
 
-  componentDidMount() {
-    this.getActivities();
-    this.fetchActivity();
-  }
+  const {cookies, params, match} = props;
+  const [active, setActive] = useState(false);
+  const [activities, setActivities] = useState([]);
+  const [activity, setActivity] = useState({});
+  const [email, setEmail] = useState(cookies.get('email'));
+  const [agenda, setAgenda] = useState([]);
+  const [date, setDate] = useState(params.day);
+  const [redirect, setRedirect] = useState(false);
+ 
 
-  componentDidUpdate (prevProps) {
-    const activityID = this.props.params.activityID
-    if (prevProps.params.activityID !== activityID) {
-  this.fetchActivity(activityID);
+  useEffect(()=>{
+    getActivities();
+    fetchActivity();
+  }, [])
+
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }
+  const prevID = usePrevious(params.activityID);
+  useEffect(() => {
+    if (prevID !== params.activityID){ // re-fetch data if params are different, triggering component refresh
+      fetchActivity(params.activityID);
     }
-    if (this.state.redirect){
-        this.setState({redirect:false})
-    }
-  }
+  });
 
-  fetchActivity = () => {
-    console.log('this.props.params', this.props.params)
+  useEffect(()=>{
+    if(redirect){
+      setRedirect(false)
+    }
+  }, [redirect])
+
+  function fetchActivity() {
     axios.get('/api/user_activities/:id', {
       params: {
-        user_activity_id: this.props.params.activityID
+        user_activity_id: params.activityID
       }
     })
     .then((response) => {
-      this.setState({
-        activity: response.data.activity,
-      });
+      setActivity(response.data.activity);
     })
   }
 
-  getActivities(){
+  function getActivities(){
     axios.get('/api/user_activities', {
       params:{
-        email: this.state.email,
-        date: this.props.params.day
+        email: email,
+        date: params.day
       }
     })
     .then((response) => {
-      console.log('response for api/user_activities', response)
-      this.setState({
-        activities: response.data.activities,
-        user_activities_id: response.data.user_activities_id
-      });
-    })
-    .catch((error) => {
-      if (error) {
-        console.log(error)
-      }
+      setActivities(response.data.activities);
     })
   }
 // toggle calender
-handleClick = () => {
-this.setState({
-    active: !this.state.active
-});
-}
-
-onSelect = (value) => {
-this.setState({
-    date: value.format('YYYY-MM-DD'),
-    redirect: true,
-});
-}
-
-complete = (event) => {    
-  axios.patch(`/api/user_activities/${this.props.params.activityID}`, 
-  {
-    email: this.state.email,
-    is_complete: !this.state.activity.is_complete
-  }) 
-    .then((response) => {      
-      let activity = {...this.state.activity}
-      activity.is_complete = !this.state.activity.is_complete
-      if(activity.is_complete){
-          this.setState({
-              activity:activity,
-              redirect:true,
-          })
-      } else {
-        this.setState({
-            activity: activity,
-        })
-      }     
-      this.fetchActivity()
-  })
-}
-
-onFullRender = (value) => {
-const date = value.format('YYYY-MM-DD');
-let style ={
-  paddingLeft:"3px",
-  opacity:0.5};
-
-for (let assigned of this.state.agenda){
-  if(date === assigned) {
-    style = {
-        background: "lightskyblue",
-        border: "1px solid lightcyan",
-        fontStyle: "italic",
-        fontWeight: "bold",
-        paddingLeft: "3px"};
-    }
-}
-return <div className="ant-fullcalendar-value" style ={style}>{value.date()}</div>
-}
-
-  render() {
-    if(this.state.redirect){
-      return (
-        <Redirect to={`/${this.state.date}/activities`}/>
-      )
-    }
-
-    return (
-      <section className="dayActivity">
-        <div className="sideBarSchedule">
-          <h3 className="dayHeading">{moment(this.props.params.day).format('dddd, MMMM Do YYYY')}
-            <div className="todayActivityIcon">
-              <Icon style={{ fontSize: '35px' }} type="calendar" onClick={this.handleClick} />
-            </div>
-          </h3>
-          {this.state.active && <Calendar onSelect={this.onSelect} dateFullCellRender={this.onFullRender} fullscreen={false} className="sidebar_calendar" />}
-
-          <div className="TodayActivityCalendar">
-            <TodayActivityCalendar activities={this.state.activities} params={this.props.match.params}/>
-          </div>
-        </div>
-
-        <div className="TodayTask">
-          <div className="TodayActivityBox">
-            <TodayActivityBox activity={this.state.activity} />
-          </div>
-          <div className="Completeness">
-            <span>Status: {this.state.activity.is_complete ? "Complete":"Incomplete"}	</span>
-          </div>
-          <div className="TodayContent">
-            <ReactMarkdown source={this.state.activity.content} />
-          </div>
-
-          <button className={this.state.activity.is_complete? 
-                              "todayActivity_cancel":
-                              "todayActivity_complete"}
-                  onClick={this.complete}>
-              {this.state.activity.is_complete ? "Wait! I'm not done yet!":"Complete Activity!"}
-          </button>
-        </div>
-      </section>
-    )
+  function handleClick() {
+    setActive(!active);
   }
+
+  function onSelect (value) {
+    setDate(value.format('YYYY-MM-DD'));
+    setRedirect(true);
+  }
+
+  function complete (event) {    
+    axios.patch(`/api/user_activities/${params.activityID}`, 
+    {
+      email: email,
+      is_complete: !activity.is_complete
+    }) 
+    .then(() => {      
+      let newActivity = {...activity}
+      newActivity.is_complete = !newActivity.is_complete
+      if(newActivity.is_complete){
+        setActivity(newActivity);
+        setRedirect(true);
+      } else {
+        setActivity(newActivity);
+      }     
+      fetchActivity()
+    })
+  }
+
+  function onFullRender(value) {
+    const date = value.format('YYYY-MM-DD');
+    let style ="activities_calendarNotScheduled";
+
+    for (let assigned of agenda){
+      if(date === assigned) {
+        style = "activities_calendarScheduled";
+      }
+    }
+    return <div className={`ant-fullcalendar-value ${style}`}>{value.date()}</div>;
+  }
+
+
+  if(redirect){
+    return <Redirect to={`/${date}/activities`}/>  
+  }
+
+  return (
+    <section className="dayActivity">
+      <div className="sideBarSchedule">
+        <h3 className="dayHeading">{moment(params.day).format('dddd, MMMM Do YYYY')}
+          <div className="todayActivityIcon">
+            <Icon style={{ fontSize: '35px' }} type="calendar" onClick={handleClick} />
+          </div>
+        </h3>
+        {active && <Calendar onSelect={onSelect} dateFullCellRender={onFullRender} fullscreen={false} className="sidebar_calendar" />}
+
+        <div className="TodayActivityCalendar">
+          <TodayActivityCalendar activities={activities} params={match.params}/>
+        </div>
+      </div>
+
+      <div className="TodayTask">
+        <div className="TodayActivityBox">
+          <TodayActivityBox activity={activity} />
+        </div>
+        <div className="Completeness">
+          <span>Status: {activity.is_complete ? "Complete":"Incomplete"}	</span>
+        </div>
+        <div className="TodayContent">
+          <ReactMarkdown source={activity.content} />
+        </div>
+
+        <button className={activity.is_complete? "todayActivity_cancel":"todayActivity_complete"} onClick={complete}>
+          {activity.is_complete ? "Wait! I'm not done yet!":"Complete Activity!"}
+        </button>
+      </div>
+    </section>
+  )
 }
 
 export default TodayActivity;
