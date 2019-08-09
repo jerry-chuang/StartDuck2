@@ -17,6 +17,7 @@ import AdminActivity from "./components/admin/AdminActivity.jsx";
 const cookies = new Cookies()
 
 function App(){
+  // eslint-disable-next-line no-unused-vars
   const [user, setUser] = useState(cookies.get('email'))
 
   return (

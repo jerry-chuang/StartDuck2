@@ -14,8 +14,8 @@ function  TodayActivity(props) {
   const [active, setActive] = useState(false);
   const [activities, setActivities] = useState([]);
   const [activity, setActivity] = useState({});
-  const [email, setEmail] = useState(cookies.get('email'));
-  const [agenda, setAgenda] = useState([]);
+  const [email] = useState(cookies.get('email'));
+  const [agenda] = useState([]);
   const [date, setDate] = useState(params.day);
   const [redirect, setRedirect] = useState(false);
  
@@ -23,6 +23,7 @@ function  TodayActivity(props) {
   useEffect(()=>{
     getActivities();
     fetchActivity();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function usePrevious(value) {
