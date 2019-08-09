@@ -145,7 +145,7 @@ class DayActivities extends React.Component{
               <button className="activities_categoriesButtons" onClick={this.allCategories}>All</button>
               <button className = "activities_edit" onClick={this.toggle.bind(this)}>edit</button>
             </div>
-            <ActivitiesList className="activities_activitiesList" cookies={this.props.cookies} handleRefresh={this.handleRefresh} shown = {this.state.shown} activities = {this.state.filterActivities}/>
+            <ActivitiesList cookies={this.props.cookies} handleRefresh={this.handleRefresh} shown = {this.state.shown} activities = {this.state.filterActivities}/>
           </div>
         </section>
       )
