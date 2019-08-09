@@ -86,13 +86,16 @@
   align-items: center;
 }
 
-.dayActivities_listBlock {
+.activities_listBlock {
   display: flex;
 }
 
-.dayActivities_deleteButton {
+.activities_deleteButton {
   display: flex;
   margin-top: 42px;
   margin-right: 10px;
   color: red;
+}
+.activities_deleteButton_hidden {
+  display: none;
 }
