@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 // import { ReactComponent as Logo } from '../images/logo.svg';
 import Logo from '../images/logo.png'
 import {Link, Redirect} from "react-router-dom";
@@ -16,85 +16,63 @@ const HideSchedule = (props) => {
   )
 }
 
-const Reschedule = withRouter(HideSchedule);
+const Reschedule = withRouter(HideSchedule); //component for rescheudule link to hide when on schedule page
 
-class Nav extends Component {
-  state = {
-    redirect: false,
-    redirect1: false,
-  }
+function Nav(props) {
+  const {cookies, setUser} = props;
+  const [redirect, setRedirect] = useState(false);
+  const [redirect1, setRedirect1] = useState(false);
 
-  logout = (e) =>{
+  useEffect(() =>{
+    if (redirect){
+      setRedirect(false)
+    }
+    if (redirect1){
+      setRedirect1(false)
+    }
+  }, [redirect, redirect1])
+ 
+  const logout = (e) =>{
     e.preventDefault();
-    this.props.cookies.remove('email',  { path: '/' })
-    this.props.setUser('')
-    this.setState({redirect:true})
+    cookies.remove('email',  { path: '/' })
+    setUser('')
+    setRedirect(true)
+  };
+  const redirectHome = (e) =>{
+    e.preventDefault();
+    setRedirect1(true)
   };
 
-  componentDidUpdate(){
-    if (this.state.redirect){
-      this.setState({redirect:false})
-    }
-    if (this.state.redirect1){
-      this.setState({redirect1:false})
-    }
+  if(redirect){
+    return <Redirect to='/'/>  
   }
 
-  redirectHome = (e) =>{
-    e.preventDefault();
-    this.setState({redirect1:true})
-  };
+  if(redirect1){
+    return <Redirect to={`/${moment().format('YYYY-MM-DD')}/activities`}/>
+  }
 
-
-
-  render(){
-    if(this.state.redirect){
-      return (
-          <Redirect to='/'/>
-      )
-    }
-
-    if(this.state.redirect1){
-      return (
-          <Redirect to={`/${moment().format('YYYY-MM-DD')}/activities`}/>
-      )
-    }
-    if(window.location.pathname === '/schedule'){
-      return(
+  if (cookies.get('email')){
+    return(
       <nav className="navbar">
-      <div className="container-fluid">
-        {/* <Logo className="navbar_logo" /> */}
-        <img src={Logo} alt ="Logo"className="navbar_logo" onClick={this.handleClick1}/>
-        <Link className="link" to="/completed_activities" currentpath = '/'>Completed Activities</Link>
-        <button className="navbar_logout" onClick={this.handleClick}>Logout</button>
-      </div>
+        <nav className="navbar_left">
+          {/* <Logo className="navbar_logo" onClick={this.redirectHome}/> */}
+          <img src={Logo} alt ="Logo"className="navbar_logo" onClick={redirectHome}/>
+        </nav>
+        <nav className="navbar_right">
+          <Reschedule/>
+          <Link className="navbar_complete" to="/completed_activities" currentpath='/'>Completed Activities</Link>
+          <button className="navbar_logout" onClick={logout}>Logout</button>
+        </nav>
       </nav>
-        )
-    }
-    if (this.props.cookies.get('email')){
-      return(
-        <nav className="navbar">
-          <nav className="navbar_left">
-            {/* <Logo className="navbar_logo" onClick={this.redirectHome}/> */}
-            <img src={Logo} alt ="Logo"className="navbar_logo" onClick={this.redirectHome}/>
-          </nav>
-          <nav className="navbar_right">
-            <Reschedule/>
-            <Link className="navbar_complete" to="/completed_activities" currentpath='/'>Completed Activities</Link>
-            <button className="navbar_logout" onClick={this.logout}>Logout</button>
-          </nav>
+  )} else{
+    return(
+      <nav className="navbar">
+        <nav className="navbar_left">
+          {/* <Logo className="navbar_logo" /> */}
+          <img src={Logo} alt ="Logo" className="navbar_logo" />
         </nav>
-    )} else{
-      return(
-        <nav className="navbar">
-          <nav className="navbar_left">
-            {/* <Logo className="navbar_logo" /> */}
-            <img src={Logo} alt ="Logo" className="navbar_logo" />
-          </nav>
-        </nav>
-
-      )
-    }
+      </nav>
+    )
   }
 }
 
