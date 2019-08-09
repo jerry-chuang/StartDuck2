@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 // import { ReactComponent as MainImage } from '../images/main.svg';
 import main from '../images/main.png'
 import { Form, Icon, Input, Button} from 'antd';
