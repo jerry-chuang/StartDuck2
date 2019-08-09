@@ -1,171 +1,157 @@
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { Redirect} from "react-router-dom";
-// import ReactDom from 'react-dom';
 import { Calendar} from 'antd';
 import ActivitiesList from './ActivitiesList.jsx';
 import axios from 'axios';
 import * as moment from 'moment';
 
-class Activities extends React.Component{
-  constructor(props) {
-    super(props)
-    this.state = {
-      activities: [],
-      categories: ['test1', 'test2'],
-      filterActivities:[],
-      email: this.props.cookies.get('email'),
-      date: moment(),
-      redirect: false,
-      scheduleRedirect: false,
-      agenda: [],
-      shown: true,
-    }
-  }
+function Activities (props) {
+  const {cookies, params} = props;
 
-  componentDidMount() {
-    this.getActivities();
-    console.log(this.state)
-  }
+  const [activities, setActivities] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [filterActivities, setFilterActivities] = useState([]);
+  const [date, setDate] = useState(moment());
+  const [redirect, setRedirect] = useState(false);
+  const [scheduleRedirect, setScheduleRedirect] = useState(false);
+  const [agenda, setAgenda] = useState([]);
+  const [shown, setShown] = useState(true);
 
-  componentDidUpdate(prevProps){
-    if(this.props.params !== prevProps.params){
-      this.getActivities();
-    }
-    if (this.state.redirect){
-      this.setState({redirect:false})
-    }
-    if (this.state.scheduleRedirect){
-      this.setState({scheduleRedirect:false})
-    }
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
   }
+  const prevParams = usePrevious(params);
+  useEffect(() => {
+    if (prevParams !== params){ // re-fetch data if params are different, triggering component refresh
+      getActivities();
+    }
+  });
 
-  getActivities(){
+  useEffect(() =>{ //reset redirects
+    if (redirect){
+      setRedirect(false)
+    }
+    if (scheduleRedirect){
+      setScheduleRedirect(false)
+    }
+  }, [redirect, scheduleRedirect]);
+
+  
+  const mounted = useRef(); //simulate componentDidUpdate for checking first time user with no agendas
+  useEffect(() =>{ 
+    if (!mounted.current) {
+      mounted.current = true;
+    } else if(!agenda.length){    
+      setScheduleRedirect(true)
+    }
+  },[agenda])
+
+  function getActivities(){
     axios.get('/api/user_activities', {
       params:{
-        email: this.state.email,
-        date: this.props.params.day
+        email: cookies.get('email'),
+        date: params.day
       }
     })
     .then((response) => {
-      console.log('response for api/user_activities', response)
-      this.setState({
-        activities: response.data.activities,
-        filterActivities: response.data.activities,
-        categories: response.data.categories,
-        agenda: response.data.agenda,
-      });
-      this.checkFirstTimeUser();
+      setActivities(response.data.activities);
+      setFilterActivities(response.data.activities)
+      setCategories(response.data.categories);
+      setAgenda(response.data.agenda);
     })
   }
 
-  handleRefresh = () => this.getActivities();
-
-  onSelect = (value) => {
-    this.setState({
-      date: value,
-      redirect: true,
-    });
+  function onSelect(value) {
+    setDate(value);
+    setRedirect(true);
   }
 
-  onFullRender = (value) => {
+  function onFullRender(value) {
     const date = value.format('YYYY-MM-DD');
     let style ="activities_calendarNotScheduled";
 
-    for (let assigned of this.state.agenda){
+    for (let assigned of agenda){
       if(date === assigned) {
         style = "activities_calendarScheduled";
-        }
+      }
     }
     return <div className={`ant-fullcalendar-value ${style}`}>{value.date()}</div>;
   }
 
-  filterCategory = (event) => {
-    this.setState({
-      filterActivities: this.state.activities.filter(
+  function filterCategory(event) {
+    setFilterActivities(
+      activities.filter(
         activity => {
           return activity.category_id === Number(event.currentTarget.id)
-        }),
-    })
+        })
+    )
   }
 
-  allCategories = () => {
-    this.setState({
-      filterActivities: this.state.activities
-    })
+  function allCategories() {
+    setFilterActivities(activities)
   }
 
-
-  toggle() {
-    this.setState({
-      shown: !this.state.shown
-    });
+  function toggle() {
+    setShown(!shown)
   }
 
-
-  checkFirstTimeUser = () => {
-    if(!this.state.agenda.length){
-      this.setState({
-        scheduleRedirect: true,
-      })
-    }
+  if(redirect){ //redirect to selected days on calendar
+    return (
+        <Redirect to={`/${date.format('YYYY-MM-DD')}/activities`}/>
+    )
   }
 
+  if(scheduleRedirect){ //redirect to schedule page if no agenda
+    return (
+        <Redirect to={`/schedule`}/>
+    )
+  }
 
-  render(){
+  const categories_button = categories.map(category => {
+    return <button id={category.id} className="activities_categoriesButtons" onClick={filterCategory}>{category.name}</button>
+  })
 
-    if(this.state.redirect){ //redirect to selected days on calendar
-      return (
-          <Redirect to={`/${this.state.date.format('YYYY-MM-DD')}/activities`}/>
-      )
-    }
-    if(this.state.scheduleRedirect){ //redirect to schedule page if no agenda
-      return (
-          <Redirect to={`/schedule`}/>
-      )
-    }
-
-    const categories = this.state.categories.map(category => {
-      return <button id={category.id} className="activities_categoriesButtons" onClick={this.filterCategory}>{category.name}</button>
-    })
-
-    if(this.state.activities.length){
-      return (
-        <section className="activities">
-          <div className="activities_left">
-            <h3>{this.state.date.format('dddd, MMMM Do YYYY')}</h3>
-            <div  className="activities_calendar" >
-              <Calendar value={moment(this.props.params.day)} onSelect={this.onSelect} dateFullCellRender={this.onFullRender} fullscreen={false}/>
-            </div>
+  if(activities.length){
+    return (
+      <section className="activities">
+        <div className="activities_left">
+          <h3>{date.format('dddd, MMMM Do YYYY')}</h3>
+          <div  className="activities_calendar" >
+            <Calendar value={moment(params.day)} onSelect={onSelect} dateFullCellRender={onFullRender} fullscreen={false}/>
           </div>
+        </div>
 
-          <div className="activities_right">
-            <h2>Activities</h2>
-            <div className="activities_categories">
-              {categories}
-              <button className="activities_categoriesButtons" onClick={this.allCategories}>All</button>
-              <button className = "activities_edit" onClick={this.toggle.bind(this)}>edit</button>
-            </div>
-            <ActivitiesList cookies={this.props.cookies} handleRefresh={this.handleRefresh} shown = {this.state.shown} activities = {this.state.filterActivities}/>
+        <div className="activities_right">
+          <h2>Activities</h2>
+          <div className="activities_categories">
+            {categories_button}
+            <button className="activities_categoriesButtons" onClick={allCategories}>All</button>
+            <button className = "activities_edit" onClick={toggle.bind(this)}>Edit</button>
           </div>
-        </section>
-      )
-    } else {
-      return (
-        <section className="activities">
-          <div className="activities_left">
-            <h3>{this.state.date.format('dddd, MMMM Do YYYY')}</h3>
-            <div className="activities_calendar" >
-              <Calendar value={moment(this.props.params.day)} onSelect={this.onSelect} dateFullCellRender={this.onFullRender} fullscreen={false}/>
-            </div>
-          </div>
-          <div className="activities_right">
-            <h2>No activities planned for the day</h2>
-          </div>
+          <ActivitiesList cookies={cookies} handleRefresh={getActivities} shown = {shown} activities = {filterActivities}/>
+        </div>
       </section>
-      )
-    }
-
+    )
+  } else {
+    return (
+      <section className="activities">
+        <div className="activities_left">
+          <h3>{date.format('dddd, MMMM Do YYYY')}</h3>
+          <div className="activities_calendar" >
+            <Calendar value={moment(params.day)} onSelect={onSelect} dateFullCellRender={onFullRender} fullscreen={false}/>
+          </div>
+        </div>
+        <div className="activities_right">
+          <h2>No activities planned for the day</h2>
+        </div>
+    </section>
+    )
   }
 }
+
 export default Activities;
 
