@@ -22,9 +22,9 @@ function AdminActivities(props) {
   // recevies categories
   const fetchCategories = () => {
     axios.get('/api/admin/categories', {})
-        .then((response) => {
-          setCategories(response.data.categories);
-        })
+      .then((response) => {
+        setCategories(response.data.categories);
+      })
   }
 
   //receives activities from backend
@@ -108,35 +108,35 @@ function AdminActivities(props) {
       <div className="newActivityForm">
         <Form labelCol={{ span: 30 }} wrapperCol={{ span: 30 }} onSubmit={handleSubmit}>
           <Form.Item>
-              {getFieldDecorator('activityName', {
-                rules: [{ required: true, message: 'Please input activity name!' }],
-              })(
-                <Input
-                  prefix={<Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                  placeholder="Activity Name"
-                  style={{width: '300px'}}
-                />
-              )}
+            {getFieldDecorator('activityName', {
+              rules: [{ required: true, message: 'Please input activity name!' }],
+            })(
+              <Input
+                prefix={<Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                placeholder="Activity Name"
+                style={{width: '300px'}}
+              />
+            )}
           </Form.Item>
           <Form.Item>
-              {getFieldDecorator('category', {
-                rules: [{ required: true, message: 'Please select category!' }],
-              })(
-                <Select placeholder="Select a category" style={{width: '300px'}}>
-                  {categoriesOption}
-                </Select>,
-              )}
+            {getFieldDecorator('category', {
+              rules: [{ required: true, message: 'Please select category!' }],
+            })(
+              <Select placeholder="Select a category" style={{width: '300px'}}>
+                {categoriesOption}
+              </Select>,
+            )}
           </Form.Item>
           <Form.Item>
-              {getFieldDecorator('duration', {
-                rules: [{ required: true, message: 'Please input duration!' }],
-              })(
-                <Input 
-                  prefix={<Icon type="dashboard" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                  placeholder="Duration in minutes"
-                  style={{width: '300px'}}
-                />
-              )}
+            {getFieldDecorator('duration', {
+              rules: [{ required: true, message: 'Please input duration!' }],
+            })(
+              <Input 
+                prefix={<Icon type="dashboard" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                placeholder="Duration in minutes"
+                style={{width: '300px'}}
+              />
+            )}
           </Form.Item>
           <Form.Item>
             <ReactMarkdown source={textarea} />
