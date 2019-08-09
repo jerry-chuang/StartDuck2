@@ -15,7 +15,7 @@ function Activities (props) {
   const [redirect, setRedirect] = useState(false);
   const [scheduleRedirect, setScheduleRedirect] = useState(false);
   const [agenda, setAgenda] = useState([]);
-  const [shown, setShown] = useState(true);
+  const [showDelete, setShowDelete] = useState(true);
 
   function usePrevious(value) {
     const ref = useRef();
@@ -40,7 +40,6 @@ function Activities (props) {
     }
   }, [redirect, scheduleRedirect]);
 
-  
   const mounted = useRef(); //simulate componentDidUpdate for checking first time user with no agendas
   useEffect(() =>{ 
     if (!mounted.current) {
@@ -96,7 +95,7 @@ function Activities (props) {
   }
 
   function toggle() {
-    setShown(!shown)
+    setShowDelete(!showDelete)
   }
 
   if(redirect){ //redirect to selected days on calendar
@@ -132,7 +131,7 @@ function Activities (props) {
             <button className="activities_categoriesButtons" onClick={allCategories}>All</button>
             <button className = "activities_edit" onClick={toggle.bind(this)}>Edit</button>
           </div>
-          <ActivitiesList cookies={cookies} getActivities={getActivities} shown = {shown} activities = {filterActivities}/>
+          <ActivitiesList cookies={cookies} getActivities={getActivities} showDelete = {showDelete} activities = {filterActivities}/>
         </div>
       </section>
     )
@@ -154,4 +153,3 @@ function Activities (props) {
 }
 
 export default Activities;
-

@@ -6,7 +6,7 @@ import axios from 'axios';
 import * as moment from 'moment';
 
 function ActivitiesList(props) {
-  const {getActivities, shown} = props;
+  const {getActivities, showDelete} = props;
 
   const onDelete = (event) => {
     axios.delete(`/api/user_activities/${event.currentTarget.id}`, {})
@@ -18,7 +18,7 @@ function ActivitiesList(props) {
   const activities = props.activities.map(activity => {
     return (
       <div className="activities_listBlock">
-        <div className={shown?'activities_deleteButton_hidden':'activities_deleteButton'}>
+        <div className={showDelete?'activities_deleteButton_hidden':'activities_deleteButton'}>
           <Icon id={activity.user_activitiy_id} onClick = {onDelete} type="minus-circle" />
         </div>
         <Link to={`/${moment(activity.date).format('YYYY-MM-DD')}/activities/${activity.user_activitiy_id}`} >
