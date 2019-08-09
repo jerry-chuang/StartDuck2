@@ -132,7 +132,7 @@ function Activities (props) {
             <button className="activities_categoriesButtons" onClick={allCategories}>All</button>
             <button className = "activities_edit" onClick={toggle.bind(this)}>Edit</button>
           </div>
-          <ActivitiesList cookies={cookies} handleRefresh={getActivities} shown = {shown} activities = {filterActivities}/>
+          <ActivitiesList cookies={cookies} getActivities={getActivities} shown = {shown} activities = {filterActivities}/>
         </div>
       </section>
     )

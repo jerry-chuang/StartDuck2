@@ -6,12 +6,12 @@ import axios from 'axios';
 import * as moment from 'moment';
 
 function ActivitiesList(props) {
-  const {handleRefresh, shown} = props;
+  const {getActivities, shown} = props;
 
   const onDelete = (event) => {
     axios.delete(`/api/user_activities/${event.currentTarget.id}`, {})
     .then(()=> {
-      handleRefresh();
+      getActivities();
     })
   }
 
