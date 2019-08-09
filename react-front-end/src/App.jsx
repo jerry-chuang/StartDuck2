@@ -5,7 +5,7 @@ import Cookies from 'universal-cookie';
 
 import Nav from './components/Nav.jsx';
 import Login from './components/Login.jsx'
-import DayActivities from "./components/activities/DayActivities.jsx";
+import Activities from "./components/activities/Activities.jsx";
 import DatePicker from "./components/schedule/datePicker.jsx";
 import TodayActivity from "./components/activity/TodayActivity.jsx";
 import CompletedActivities from './components/completeActivities/CompletedActivities.jsx'
@@ -46,7 +46,7 @@ function App(){
           />
           <Route
             path="/:day/activities/"
-            render={(props) => <DayActivities {...props} cookies={cookies} params={props.match.params} />}
+            render={(props) => <Activities {...props} cookies={cookies} params={props.match.params} />}
           />
           <Route
           path="/completed_activities/:id"

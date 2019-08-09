@@ -6,7 +6,7 @@ import ActivitiesList from './ActivitiesList.jsx';
 import axios from 'axios';
 import * as moment from 'moment';
 
-class DayActivities extends React.Component{
+class Activities extends React.Component{
   constructor(props) {
     super(props)
     this.state = {
@@ -167,5 +167,5 @@ class DayActivities extends React.Component{
 
   }
 }
-export default DayActivities;
+export default Activities;
 
