@@ -1,48 +1,38 @@
-import React, {Component} from 'react';
+import React from 'react';
 import ActivityItem from './ActivityItem.jsx'
 import {Link} from "react-router-dom";
 import { Icon } from 'antd';
 import axios from 'axios';
 import * as moment from 'moment';
 
+function ActivitiesList(props) {
+  const {handleRefresh, shown} = props;
 
-class ActivitiesList extends Component {
-  state = {
-    email: this.props.cookies.get('email'),
-  }
-
-  onDelete = (event) => {
-    console.log(event.currentTarget.id)
+  const onDelete = (event) => {
     axios.delete(`/api/user_activities/${event.currentTarget.id}`, {})
-    .then(response => {
-      this.props.handleRefresh()
+    .then(()=> {
+      handleRefresh();
     })
   }
 
-  render() {
-    // var shown = {
-    //   display: this.props.shown ? "block" : "none"
-    // };
-    var hidden = {
-      display: this.props.shown ? "none" : "block"
-    }
-
-    const activities = this.props.activities.map(activity => {
-      return <div className="dayActivities_listBlock">
-              <div className="dayActivities_deleteButton">
-                <Icon id={activity.user_activitiy_id} onClick = {this.onDelete} style={ hidden } type="minus-circle" />
-              </div>
-              <Link to={`/${moment(activity.date).format('YYYY-MM-DD')}/activities/${activity.user_activitiy_id}`} >
-                  <ActivityItem key = {activity.user_activitiy_id} {...activity } />
-              </Link>
-             </div>
-    })
+  const activities = props.activities.map(activity => {
     return (
-      <main className="dayActivities_activitiesList">
-        {activities}
-      </main>
-    );
-  }
+      <div className="activities_listBlock">
+        <div className={shown?'activities_deleteButton_hidden':'activities_deleteButton'}>
+          <Icon id={activity.user_activitiy_id} onClick = {onDelete} type="minus-circle" />
+        </div>
+        <Link to={`/${moment(activity.date).format('YYYY-MM-DD')}/activities/${activity.user_activitiy_id}`} >
+          <ActivityItem key = {activity.user_activitiy_id} {...activity } />
+        </Link>
+      </div>
+    )
+  })
+
+  return (
+    <main className="activities_activitiesList">
+      {activities}
+    </main>
+  )
 }
 
 export default ActivitiesList;
