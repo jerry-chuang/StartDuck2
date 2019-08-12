@@ -1,78 +1,75 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios';
 import CompletedActivitiesList from './CompletedActivitiesList.jsx';
 
-class CompletedActivities extends Component {
-  constructor(props) {
-      super(props);
-      this.state = {
-          activities: [],
-          categories: [],
-          filterActivities: [],
-          email: this.props.cookies.get('email'),
-          // completeness: true
-      };
-  }
+function  CompletedActivities(props) {
+  const [activities, setActivities] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [filterActivities, setFilterActivities] = useState([])
+  const {cookies, params} = props;
+ 
+  useEffect(()=>{
+    getActivities();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])// run only once on mount
 
-  componentDidMount() {
-    this.getActivities();
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
   }
-
-  componentDidUpdate(prevProps){
-    if(this.props.params !== prevProps.params){
-      this.getActivities();
+  const prevParams = usePrevious(params);
+  useEffect(() => {
+    if (prevParams !== params){ // re-fetch data if params are different, triggering component refresh
+      getActivities();
     }
-  }
+  });
 
-
-  getActivities(){
+  function getActivities(){
     axios.get('/api/users/:id', {
       params:{
-        email: this.state.email,
+        email: cookies.get('email'),
       }
     })
     .then((response) => {
-      this.setState({
-        activities: response.data.activities,
-        filterActivities: response.data.activities,
-        categories: response.data.categories
-      });
+      const {activities, categories} = response.data;
+      setActivities(activities);
+      setFilterActivities(activities);
+      setCategories(categories);
     })
   }
 
-  filterCategory = (event) => {
-    this.setState({
-      filterActivities: this.state.activities.filter(
+  const filterCategory = (event) => {
+    setFilterActivities(
+      activities.filter(
         activity => {
           return activity.category_id === Number(event.currentTarget.id)
         }),
-    })
+    );
   }
 
-  allCategories = () => {
-    this.setState({
-      filterActivities: this.state.activities
-    })
+  const allCategories = () => {
+    setFilterActivities(activities);
   }
 
-  render () {
-    const categories = this.state.categories.map(category => {
-      return <button id={category.id} className="activities_categoriesButtons" onClick={this.filterCategory}>{category.name}</button>
-    })
+  const categories_button = categories.map(category => {
+    return <button id={category.id} className="activities_categoriesButtons" onClick={filterCategory}>{category.name}</button>
+  });
 
-    return (
-      <section className="activities">
+  return (
+    <section className="activities">
       <div>
-      <div className="activities_categories">
-        {categories}
-        <button className="activities_categoriesButtons" onClick={this.allCategories}>All</button>
+        <div className="activities_categories">
+          {categories_button}
+          <button className="activities_categoriesButtons" onClick={allCategories}>All</button>
         </div>
-      <h2>Completed Activities</h2>
-      <CompletedActivitiesList className="activities_activitiesList" activities = {this.state.filterActivities}/>
+        <h2>Completed Activities</h2>
+        <CompletedActivitiesList className="activities_activitiesList" activities = {filterActivities}/>
       </div>
-      </section>
-    )
-  }
+    </section>
+  )
 }
 
 export default CompletedActivities
