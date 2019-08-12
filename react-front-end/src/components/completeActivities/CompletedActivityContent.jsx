@@ -1,65 +1,65 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TodayActivityBox from '../activity/TodayActivityBox.jsx';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 
-class CompletedActivityContent extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            active: false,
-            activities: [],
-            activity: {},
-            categories: [],
-            email: this.props.cookies.get('email')
-        };
-    }
+function CompletedActivityContent (props){
+  const [active, setActive] = useState(false);
+  const [activities, setActivities] = useState([]);
+  const [activity, setActivity] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-    componentDidMount() {
-        this.fetchActivity(this.props.params.id);
-    }
+  const {cookies, params} = props;
+  console.log('params', params.id)
+  useEffect(()=>{
+    fetchActivity();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])// run only once on mount
 
-    componentDidUpdate (prevProps) {
-        const activityID = this.props.params.activityID
-
-        if (prevProps.params.activityID !== activityID) {
-            this.fetchActivity(activityID);
-        }
+  function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }
+  const prevParams = usePrevious(params);
+  useEffect(() => {
+    if (prevParams !== params){ // re-fetch data if params are different, triggering component refresh
+      fetchActivity();
     }
+  });
 
-    fetchActivity = (activityID) => {
-        axios.get('/api/users/:id', {
-            params: {
-                email: this.state.email,
-            }
-        }) 
-            .then((response) => {
-                const activity = response.data.activities.find(element => {
-                    return element.id === Number(this.props.params.id);
-                })
-                this.setState({
-                    activities: response.data.activities,
-                    activity: activity
-                });
-            })
-    }
+  function fetchActivity() {
+    axios.get('/api/admin/activities/:id', {
+      
+      params: {
+        id: Number(params.id)
+      }
+    })
+    .then((response) => {
+      console.log('response.dta', response.data)
+      setActivity(response.data.activity);
+    })
+  }
 
-    render() {
-        return (
-            <section className="dayActivity">
-                <div className="TodayTask">
-                    <div className="TodayActivityBox">
-                        <TodayActivityBox activity={this.state.activity} />
-                    </div>
-                    <div className="Completeness">
-                        <span>Status: Completed </span>
-                    </div>
-                    <div className="TodayContent">
-                        <ReactMarkdown source={this.state.activity.content} />
-                    </div>
-                </div>
-            </section>
-        )
-    }
+
+  return (
+      <section className="dayActivity">
+          <div className="TodayTask">
+              <div className="TodayActivityBox">
+                  <TodayActivityBox activity={activity} />
+              </div>
+              <div className="Completeness">
+                  <span>Status: Completed </span>
+              </div>
+              <div className="TodayContent">
+                  <ReactMarkdown source={activity.content} />
+              </div>
+          </div>
+      </section>
+  )
+
 }
+
 export default CompletedActivityContent;
