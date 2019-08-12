@@ -20,7 +20,7 @@ module.exports = (knex) => {
   router.get('/:id', (req, res) => {
     knex('activities')
     .select('*')
-    .where('id', req.params.id)
+    .where('id', req.query.id)
     .then(results => {
       res.json({
         activity: results[0],
