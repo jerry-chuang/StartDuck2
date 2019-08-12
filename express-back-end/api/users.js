@@ -34,10 +34,11 @@ module.exports = (knex) => {
     .then(results => {
       const userID = results[0].id
       knex
-      .select()
+      .select('*', 'activities.name AS name', 'categories.name AS categories', 'user_activities.id AS user_activitiy_id')
       .table('user_agendas')
       .join('user_activities', 'user_agendas.id', 'user_activities.user_agenda_id')
       .join('activities','user_activities.activity_id', 'activities.id' )
+      .join('categories', 'activities.category_id', 'categories.id')
       .where('user_agendas.user_id', userID)
       .where('is_complete', true)
       .then(results => {
@@ -47,7 +48,7 @@ module.exports = (knex) => {
             return {
               id: results.find(item => item.categories  === category).id,
               name: category
-            }
+            } 
           });
         
         res.json({
