@@ -4,13 +4,9 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 
 function CompletedActivityContent (props){
-  const [active, setActive] = useState(false);
-  const [activities, setActivities] = useState([]);
   const [activity, setActivity] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const {params} = props;
 
-  const {cookies, params} = props;
-  console.log('params', params.id)
   useEffect(()=>{
     fetchActivity();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -32,17 +28,14 @@ function CompletedActivityContent (props){
 
   function fetchActivity() {
     axios.get('/api/admin/activities/:id', {
-      
       params: {
-        id: Number(params.id)
+        id: params.id
       }
     })
     .then((response) => {
-      console.log('response.dta', response.data)
       setActivity(response.data.activity);
     })
   }
-
 
   return (
       <section className="dayActivity">
