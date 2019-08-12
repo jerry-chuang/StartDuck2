@@ -3,11 +3,10 @@ import CompletedActivitiesItem from './CompletedActivitiesItem.jsx'
 import {Link} from "react-router-dom";
 
 function CompletedActivitiesList(props) {
-  console.log(props)
   const activities = props.activities.map(activity => {
     return (
-      <Link to={`/completed_activities/${activity.id}`} >
-        <CompletedActivitiesItem key = {activity.id} {...activity } />
+      <Link to={`/completed_activities/${activity.activity_id}`} >
+        <CompletedActivitiesItem key = {activity.activity_id} {...activity } />
       </Link>
     )
   })
