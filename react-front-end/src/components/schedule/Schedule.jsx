@@ -1,12 +1,12 @@
 import React from 'react';
 import { Form, DatePicker, Button} from 'antd';
-import TimePicker123 from './TimePicker.jsx';
+import TimePicker from './TimePicker.jsx';
 import CategoryPicker from './CategoryPicker.jsx';
 import axios from 'axios';
 import { Redirect } from 'react-router'
 import * as moment from 'moment';
 
-class datePicker extends React.Component {
+class Schedule extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -128,7 +128,7 @@ class datePicker extends React.Component {
        </Form.Item>
        <p className="text_schedule_form">How many hours per day</p>
        <Form.Item>
-        <TimePicker123
+        <TimePicker
         onSelectedTime = { this.setTime }
         />
        </Form.Item>
@@ -164,5 +164,5 @@ class datePicker extends React.Component {
   }
 }
 
-export default datePicker;
+export default Schedule;
 

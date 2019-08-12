@@ -6,7 +6,7 @@ import Cookies from 'universal-cookie';
 import Nav from './components/Nav.jsx';
 import Login from './components/Login.jsx'
 import Activities from "./components/activities/Activities.jsx";
-import DatePicker from "./components/schedule/datePicker.jsx";
+import Schedule from "./components/schedule/Schedule.jsx";
 import TodayActivity from "./components/activity/TodayActivity.jsx";
 import CompletedActivities from './components/completeActivities/CompletedActivities.jsx'
 import CompletedActivityContent from './components/completeActivities/CompletedActivityContent.jsx'
@@ -43,7 +43,7 @@ function App(){
           />
           <Route
             path="/schedule"
-            render={(props) => <DatePicker {...props} cookies={cookies} />}
+            render={(props) => <Schedule {...props} cookies={cookies} />}
           />
           <Route
             path="/:day/activities/"
