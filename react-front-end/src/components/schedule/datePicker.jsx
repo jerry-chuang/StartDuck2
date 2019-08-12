@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, DatePicker, Button} from 'antd';
 import TimePicker123 from './TimePicker.jsx';
-import Schedule from './Schedule.jsx';
+import CategoryPicker from './CategoryPicker.jsx';
 import axios from 'axios';
 import { Redirect } from 'react-router'
 import * as moment from 'moment';
@@ -122,7 +122,7 @@ class datePicker extends React.Component {
       <div className="datePicker_form">
        <Form {...formItemLayout} >
        <Form.Item >
-        <Schedule
+        <CategoryPicker
          onSelectedCategories = { this.setCategories }
         />
        </Form.Item>

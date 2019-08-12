@@ -4,7 +4,7 @@ import SlideToggle from "react-slide-toggle";
 import axios from 'axios';
 
 
-class schedule extends React.Component{
+class CategoryPicker extends React.Component{
 
     constructor(props) {
       super(props)
@@ -61,6 +61,6 @@ class schedule extends React.Component{
    }
   };
 
-export default schedule;
+export default CategoryPicker;
 
 
