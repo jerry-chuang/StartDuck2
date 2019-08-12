@@ -43,16 +43,31 @@ module.exports = (knex) => {
       .where('is_complete', true)
       .then(results => {
         const categories = 
-          Array.from (new Set (results.map(item =>item.categories))) // get unique list of categoreis
+          Array.from (new Set (results.map(item =>item.categories))) // get unique list of categories
           .map( category => {
             return {
               id: results.find(item => item.categories  === category).id,
               name: category
             } 
           });
+
+          const activities = 
+          Array.from (new Set (results.map(item =>item.activity_id))) // get unique list of activities
+          .map( activity_id => {
+            const found = results.find(item => item.activity_id  === activity_id);
+            return {
+              activity_id: activity_id,
+              name: found.name,
+              duration: found.duration,
+              content: found.content,
+              category_id: found.category_id,
+              is_complete: found.is_complete,
+            } 
+          });
+     
         
         res.json({
-          activities: results,
+          activities: activities,
           categories: categories
         });
       });
