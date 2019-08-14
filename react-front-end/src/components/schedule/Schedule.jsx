@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Form, DatePicker, Button} from 'antd';
 import TimePicker from './TimePicker.jsx';
 import CategoryPicker from './CategoryPicker.jsx';
@@ -6,163 +6,134 @@ import axios from 'axios';
 import { Redirect } from 'react-router'
 import * as moment from 'moment';
 
-class Schedule extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      hours_per_day: 0,
-      categories: [],
-      start_date: null,
-      end_date: null,
-      endOpen: false,
-      redirect: false,
-      // showAlert: false,
-    }
-  };
+function Schedule(props) {
 
-  disabledStartDate = start_date => {
-    const { end_date } = this.state;
+  const [hours_per_day, setHours_per_day] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [start_date, setStart_date] = useState(null);
+  const [end_date, setEnd_date] = useState(null);
+  const [endOpen, setEndOpen] = useState(false);
+  const [redirect, setRedirect] = useState(false);
+  const {cookies} = props;
+
+  //functions for calendar date pickers
+  const disabledStartDate = start_date => {
     if (!start_date || !end_date) {
       return moment().add(-1, 'days')  >= start_date;
     }
       return moment().add(-1, 'days')  >= start_date || end_date < start_date;
   };
 
-  disabledEndDate = end_date => {
-    const { start_date } = this.state;
+  const disabledEndDate = end_date => {
     if (!end_date || !start_date) {
       return moment().add(-1, 'days')  >= end_date;
     }
     return end_date < start_date;
   };
 
-  onChange = (field, value) => {
-    this.setState({
-      [field]: value,
-    });
+  const onStartChange = value => {
+    setStart_date(value);
   };
 
-  onStartChange = value => {
-    this.onChange('start_date', value);
+  const onEndChange = value => {
+    setEnd_date(value);
   };
 
-  onEndChange = value => {
-    this.onChange('end_date', value);
-  };
-
-  handleStartOpenChange = open => {
+  const handleStartOpenChange = open => {
     if (!open) {
-      this.setState({ endOpen: true });
+      setEndOpen(true);
     }
   };
 
-  handleEndOpenChange = open => {
-    this.setState({ endOpen: open });
+  const handleEndOpenChange = open => {
+    setEndOpen(open);
+  };
+  //end functions for calendar date pickers
+
+  const pickCategories = event => {
+    var category1 = categories
+    category1.push(event.target.value)
+    setCategories(category1)
   };
 
-  setCategories = topics => {
-    var category1 = this.state.categories
-    category1.push(topics)
-    this.setState({
-      categories: category1
-    });
+  const setTime = hours_per_day => {
+    setHours_per_day(hours_per_day)
   };
 
-  setTime = hours_per_day => {
-    this.setState({ hours_per_day: hours_per_day });
-  };
-
-  handleSubmit = () => {
+  const handleSubmit = () => {
     axios.post('/api/user_agendas',
-        {
-        email: this.props.cookies.get('email'),
-        start_date: this.state.start_date.format('YYYY-MM-DD'),
-        end_date: this.state.end_date.format('YYYY-MM-DD'),
-        categories: this.state.categories,
-        hours_per_day: this.state.hours_per_day
-      }).then(() => this.setState({ redirect: true }));
+      {
+      email: cookies.get('email'),
+      start_date: start_date.format('YYYY-MM-DD'),
+      end_date: end_date.format('YYYY-MM-DD'),
+      categories: categories,
+      hours_per_day: hours_per_day
+      })
+      .then(() => setRedirect(true));
   }
 
-  // onClose = e => {
-  //   console.log(e, 'I was closed.');
-  // };
+  const isFormValid = () => {
+    return hours_per_day && categories.length && start_date && end_date
+  }
 
-  isFormValid = () => {
-  const {hours_per_day, categories, start_date, end_date} = this.state
+  const formItemLayout = {
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 8 },
+    },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 16 },
+    },
+  };
 
-  return hours_per_day && categories.length && start_date && end_date
-}
+  if (redirect) {
+    return <Redirect to={`/${moment().format('YYYY-MM-DD')}/activities`}/>;
+  }
 
-  render() {
-    const { redirect } = this.state;
-    const { start_date, end_date, endOpen } = this.state;
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 },
-      },
-    };
-
-     if (redirect) {
-       return <Redirect to={`/${moment().format('YYYY-MM-DD')}/activities`}/>;
-     }
-     // if (this.state.showAlert){
-     //   return (<Alert
-     //    message="You have to pick at least one category🧐"
-     //    type="warning"
-     //    closable
-     //    onClose={this.onClose}
-     //   />)
-     // }
-    return (
-      <div className="datePicker_form">
-       <Form {...formItemLayout} >
-       <Form.Item >
-        <CategoryPicker
-         onSelectedCategories = { this.setCategories }
-        />
-       </Form.Item>
-       <p className="text_schedule_form">How many hours per day</p>
-       <Form.Item>
-        <TimePicker
-        onSelectedTime = { this.setTime }
-        />
-       </Form.Item>
+  return (
+    <div className="datePicker_form">
+      <Form {...formItemLayout} >
+        <Form.Item >
+          <CategoryPicker
+            pickCategories={pickCategories}
+          />
+        </Form.Item>
+        <p className="text_schedule_form">How many hours per day</p>
+        <Form.Item>
+          <TimePicker
+          onSelectedTime={setTime}
+          />
+        </Form.Item>
         <Form.Item>
           <DatePicker
-            disabledDate={this.disabledStartDate}
+            disabledDate={disabledStartDate}
             showTime
             format="YYYY-MM-DD"
             value={start_date}
             placeholder="Star Date"
-            onChange={this.onStartChange}
-            onOpenChange={this.handleStartOpenChange}
+            onChange={onStartChange}
+            onOpenChange={handleStartOpenChange}
           />
-         </Form.Item>
+        </Form.Item>
         <Form.Item>
           <DatePicker
-            disabledDate={this.disabledEndDate}
+            disabledDate={disabledEndDate}
             showTime
             format="YYYY-MM-DD"
             value={end_date}
             placeholder="End Date"
-            onChange={this.onEndChange}
-            open={endOpen}
-            onOpenChange={this.handleEndOpenChange}
+            onChange={onEndChange}
+            // open={endOpen}
+            onOpenChange={handleEndOpenChange}
           />
-         </Form.Item>
-          <Button className="datePicker_button" disabled={!this.isFormValid()} onClick={this.handleSubmit}>
-            Submit
-          </Button>
+        </Form.Item>
+        <Button className="datePicker_button" disabled={!isFormValid()} onClick={handleSubmit}>
+          Submit
+        </Button>
       </Form>
-      </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default Schedule;
-
