@@ -1,6 +1,6 @@
 # StartDuck2
 
-Based on the LHL finals project StartDuck['StartDuck'](https://github.com/JerChuang/StartDuck), StartDuck2 is a productivity app re-built with React Hooks, React Router, Ant Design UI Framework for front-end, Express.js for server, and PostgreSQL for database.
+Based on the LHL final project [StartDuck](https://github.com/JerChuang/StartDuck), StartDuck2 is a productivity app re-built with React Hooks, React Router, Ant Design UI Framework for front-end, Express.js for server, and PostgreSQL for database. 
 
 ## Final Product
 #### Landing Page:
@@ -36,21 +36,10 @@ Based on the LHL finals project StartDuck['StartDuck'](https://github.com/JerChu
 8. Visit `localhost:3000` in your browser.
 
 ## Dependencies
-- Ruby 2.6.x or above
-- Rails 5.2.2 or above
+- Express
 - PostgreSQL
-- Puma
-- Byebug
 - React
 - Antd
-- Axois
+- Axios
 - React-router
 - Universal-cookie
-
-
-## Authors
-
-Developed By:
-- Jerry Chuang[@JerChuang](https://github.com/JerChuang)
-- Betty Qu [@betttyquu](https://github.com/betttyquu)
-- XiaoYu Sun [@sunasunasun](https://github.com/sunasunasun)
