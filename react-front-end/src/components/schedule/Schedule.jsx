@@ -51,9 +51,19 @@ function Schedule(props) {
   //end functions for calendar date pickers
 
   const pickCategories = event => {
-    var category1 = categories
-    category1.push(event.target.value)
-    setCategories(category1)
+    const {value, checked} = event.target;
+    if (checked){
+      let category1 = categories.concat()
+      category1.push(value)
+      setCategories(category1)
+    } else {
+      const index = categories.indexOf(value);
+      if (index > -1){
+        let category1 = categories.concat()
+        category1.splice(index, 1);
+        setCategories(category1)
+      }
+    }
   };
 
   const setTime = hours_per_day => {
