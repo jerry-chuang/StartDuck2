@@ -18,14 +18,14 @@ function Activities (props) {
     showDelete: false
   };
 
-
-  const [activities, setActivities] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [filterActivities, setFilterActivities] = useState([]);
+  const [data, setData] =  useState(initialState);
+  // const [activities, setActivities] = useState([]);
+  // const [categories, setCategories] = useState([]);
+  // const [filterActivities, setFilterActivities] = useState([]);
   const [date, setDate] = useState(moment());
   const [redirect, setRedirect] = useState(false);
   const [scheduleRedirect, setScheduleRedirect] = useState(false);
-  const [agenda, setAgenda] = useState([]);
+  // const [agenda, setAgenda] = useState([]);
   const [showDelete, setShowDelete] = useState(false);
 
   function usePrevious(value) {
@@ -55,10 +55,10 @@ function Activities (props) {
   useEffect(() =>{ 
     if (!mounted.current) {
       mounted.current = true;
-    } else if(!agenda.length){    
+    } else if(!data.agenda.length){    
       setScheduleRedirect(true)
     }
-  },[agenda])
+  },[data.agenda])
 
   function getActivities(){
     axios.get('/api/user_activities', {
@@ -68,10 +68,18 @@ function Activities (props) {
       }
     })
     .then((response) => {
-      setActivities(response.data.activities);
-      setFilterActivities(response.data.activities)
-      setCategories(response.data.categories);
-      setAgenda(response.data.agenda);
+      const {activities, categories, agenda} = response.data;
+      setData({
+        ...data,
+        filterActivities: activities,
+        activities,
+        categories,
+        agenda  
+      })
+      // setActivities(response.data.activities);
+      // setFilterActivities(response.data.activities)
+      // setCategories(response.data.categories);
+      // setAgenda(response.data.agenda);
     })
   }
 
@@ -84,8 +92,8 @@ function Activities (props) {
     const date = value.format('YYYY-MM-DD');
     let style ="activities_calendarNotScheduled";
 
-    for (let assigned of agenda){
-      if(date === assigned) {
+    for (let assigned of data.agenda){
+      if(date === moment(assigned).format('YYYY-MM-DD')) {
         style = "activities_calendarScheduled";
       }
     }
@@ -93,16 +101,27 @@ function Activities (props) {
   }
 
   function filterCategory(event) {
-    setFilterActivities(
-      activities.filter(
+    setData({
+      ...data,
+      filterActivities: data.activities.filter(
         activity => {
           return activity.category_id === Number(event.currentTarget.id)
         })
-    )
+    })
+    // setFilterActivities(
+    //   data.activities.filter(
+    //     activity => {
+    //       return activity.category_id === Number(event.currentTarget.id)
+    //     })
+    // )
   }
 
   function allCategories() {
-    setFilterActivities(activities)
+    setData({
+      ...data,
+      filterActivities: data.activities
+    })
+    // setFilterActivities(data.activities)
   }
 
   function toggle() {
@@ -121,11 +140,11 @@ function Activities (props) {
     )
   }
 
-  const categories_button = categories.map(category => {
+  const categories_button = data.categories.map(category => {
     return <button id={category.id} className="activities_categoriesButtons" onClick={filterCategory}>{category.name}</button>
   })
 
-  if(activities.length){
+  if(data.activities.length){
     return (
       <section className="activities">
         <div className="activities_left">
@@ -142,7 +161,7 @@ function Activities (props) {
             <button className="activities_categoriesButtons" onClick={allCategories}>All</button>
             <button className = "activities_edit" onClick={toggle}>Edit</button>
           </div>
-          <ActivitiesList cookies={cookies} getActivities={getActivities} showDelete = {showDelete} activities = {filterActivities}/>
+          <ActivitiesList cookies={cookies} getActivities={getActivities} showDelete = {showDelete} activities = {data.filterActivities}/>
         </div>
       </section>
     )
