@@ -19,14 +19,6 @@ function Activities (props) {
   };
 
   const [data, setData] =  useState(initialState);
-  // const [activities, setActivities] = useState([]);
-  // const [categories, setCategories] = useState([]);
-  // const [filterActivities, setFilterActivities] = useState([]);
-  const [date, setDate] = useState(moment());
-  const [redirect, setRedirect] = useState(false);
-  const [scheduleRedirect, setScheduleRedirect] = useState(false);
-  // const [agenda, setAgenda] = useState([]);
-  const [showDelete, setShowDelete] = useState(false);
 
   function usePrevious(value) {
     const ref = useRef();
@@ -43,22 +35,31 @@ function Activities (props) {
   });
 
   useEffect(() =>{ //reset redirects
-    if (redirect){
-      setRedirect(false)
+    if (data.redirect){
+      setData({
+        ...data,
+        redirect: false
+      })
     }
-    if (scheduleRedirect){
-      setScheduleRedirect(false)
+    if (data.scheduleRedirect){
+      setData({
+        ...data,
+        scheduleRedirect: false
+      })
     }
-  }, [redirect, scheduleRedirect]);
+  }, [data]);
 
   const mounted = useRef(); //simulate componentDidUpdate for checking first time user with no agendas
   useEffect(() =>{ 
     if (!mounted.current) {
       mounted.current = true;
     } else if(!data.agenda.length){    
-      setScheduleRedirect(true)
+      setData({
+        ...data,
+        scheduleRedirect: true
+      })
     }
-  },[data.agenda])
+  })
 
   function getActivities(){
     axios.get('/api/user_activities', {
@@ -76,16 +77,15 @@ function Activities (props) {
         categories,
         agenda  
       })
-      // setActivities(response.data.activities);
-      // setFilterActivities(response.data.activities)
-      // setCategories(response.data.categories);
-      // setAgenda(response.data.agenda);
     })
   }
 
   function onSelect(value) {
-    setDate(value);
-    setRedirect(true);
+    setData({
+      ...data,
+      date: value,
+      redirect: true
+    })
   }
 
   function onFullRender(value) {
@@ -108,12 +108,6 @@ function Activities (props) {
           return activity.category_id === Number(event.currentTarget.id)
         })
     })
-    // setFilterActivities(
-    //   data.activities.filter(
-    //     activity => {
-    //       return activity.category_id === Number(event.currentTarget.id)
-    //     })
-    // )
   }
 
   function allCategories() {
@@ -121,20 +115,22 @@ function Activities (props) {
       ...data,
       filterActivities: data.activities
     })
-    // setFilterActivities(data.activities)
   }
 
   function toggle() {
-    setShowDelete(!showDelete)
+    setData({
+      ...data,
+      showDelete: !data.showDelete
+    })
   }
 
-  if(redirect){ //redirect to selected days on calendar
+  if(data.redirect){ //redirect to selected days on calendar
     return (
-        <Redirect to={`/${date.format('YYYY-MM-DD')}/activities`}/>
+        <Redirect to={`/${data.date.format('YYYY-MM-DD')}/activities`}/>
     )
   }
 
-  if(scheduleRedirect){ //redirect to schedule page if no agenda
+  if(data.scheduleRedirect){ //redirect to schedule page if no agenda
     return (
         <Redirect to={`/schedule`}/>
     )
@@ -148,7 +144,7 @@ function Activities (props) {
     return (
       <section className="activities">
         <div className="activities_left">
-          <h3>{date.format('dddd, MMMM Do YYYY')}</h3>
+          <h3>{data.date.format('dddd, MMMM Do YYYY')}</h3>
           <div  className="activities_calendar" >
             <Calendar value={moment(params.day)} onSelect={onSelect} dateFullCellRender={onFullRender} fullscreen={false}/>
           </div>
@@ -161,7 +157,7 @@ function Activities (props) {
             <button className="activities_categoriesButtons" onClick={allCategories}>All</button>
             <button className = "activities_edit" onClick={toggle}>Edit</button>
           </div>
-          <ActivitiesList cookies={cookies} getActivities={getActivities} showDelete = {showDelete} activities = {data.filterActivities}/>
+          <ActivitiesList cookies={cookies} getActivities={getActivities} showDelete = {data.showDelete} activities = {data.filterActivities}/>
         </div>
       </section>
     )
@@ -169,7 +165,7 @@ function Activities (props) {
     return (
       <section className="activities">
         <div className="activities_left">
-          <h3>{date.format('dddd, MMMM Do YYYY')}</h3>
+          <h3>{data.date.format('dddd, MMMM Do YYYY')}</h3>
           <div className="activities_calendar" >
             <Calendar value={moment(params.day)} onSelect={onSelect} dateFullCellRender={onFullRender} fullscreen={false}/>
           </div>
