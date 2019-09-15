@@ -7,6 +7,17 @@ import * as moment from 'moment';
 
 function Activities (props) {
   const {cookies, params} = props;
+  const initialState = {
+    activities: [],
+    categories: [],
+    filterActivities: [],
+    date: moment(),
+    redirect: false,
+    scheduleRedirect: false,
+    agenda: [],
+    showDelete: false
+  };
+
 
   const [activities, setActivities] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -15,7 +26,7 @@ function Activities (props) {
   const [redirect, setRedirect] = useState(false);
   const [scheduleRedirect, setScheduleRedirect] = useState(false);
   const [agenda, setAgenda] = useState([]);
-  const [showDelete, setShowDelete] = useState(true);
+  const [showDelete, setShowDelete] = useState(false);
 
   function usePrevious(value) {
     const ref = useRef();
@@ -129,7 +140,7 @@ function Activities (props) {
           <div className="activities_categories">
             {categories_button}
             <button className="activities_categoriesButtons" onClick={allCategories}>All</button>
-            <button className = "activities_edit" onClick={toggle.bind(this)}>Edit</button>
+            <button className = "activities_edit" onClick={toggle}>Edit</button>
           </div>
           <ActivitiesList cookies={cookies} getActivities={getActivities} showDelete = {showDelete} activities = {filterActivities}/>
         </div>

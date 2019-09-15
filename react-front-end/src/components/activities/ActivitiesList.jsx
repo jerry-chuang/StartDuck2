@@ -17,9 +17,9 @@ function ActivitiesList(props) {
 
   const activities = props.activities.map(activity => {
     return (
-      <div className="activities_listBlock">
-        <div className={showDelete?'activities_deleteButton_hidden':'activities_deleteButton'}>
-          <Icon id={activity.user_activitiy_id} onClick = {onDelete} type="minus-circle" />
+      <div className='activities_listBlock'>
+        <div className={showDelete?'activities_deleteButton':'activities_deleteButton_hidden'}>
+          <Icon id={activity.user_activitiy_id} onClick = {onDelete} type='minus-circle' />
         </div>
         <Link to={`/${moment(activity.date).format('YYYY-MM-DD')}/activities/${activity.user_activitiy_id}`} >
           <ActivityItem key = {activity.user_activitiy_id} {...activity } />
@@ -29,7 +29,7 @@ function ActivitiesList(props) {
   })
 
   return (
-    <main className="activities_activitiesList">
+    <main className='activities_activitiesList'>
       {activities}
     </main>
   )
