@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useReducer} from 'react';
 import { Form, DatePicker, Button} from 'antd';
 import TimePicker from './TimePicker.jsx';
 import CategoryPicker from './CategoryPicker.jsx';
@@ -6,84 +6,146 @@ import axios from 'axios';
 import { Redirect } from 'react-router'
 import * as moment from 'moment';
 
-function Schedule(props) {
+function Schedule({cookies}) {
 
-  const [hours_per_day, setHours_per_day] = useState(0);
-  const [categories, setCategories] = useState([]);
-  const [start_date, setStart_date] = useState(null);
-  const [end_date, setEnd_date] = useState(null);
-  const [endOpen, setEndOpen] = useState(false);
-  const [redirect, setRedirect] = useState(false);
-  const {cookies} = props;
+  const initialState = {
+    hours_per_day: 0,
+    categories: [],
+    start_date: null,
+    end_date: null,
+    endOpen: false,
+    redirect: false
+  }
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case "SET_HOURS_PER_DAY":
+        return {
+          ...state,
+          hours_per_day: action.payload
+        };
+      case "SET_CATEGORIES":
+        return {
+          ...state,
+          categories: action.payload
+        };
+      case "SET_START_DATE":
+        return {
+          ...state,
+          start_date: action.payload
+        };
+      case "SET_END_DATE":
+        return {
+          ...state,
+          end_date: action.payload
+        };
+      case "SET_ENDOPEN":
+        return {
+          ...state,
+          endOpen: action.payload
+        };
+      case "SET_REDIRECT":
+        return {
+          ...state,
+          redirect: action.payload
+        };
+      default:
+        return state;
+    }
+  }
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   //functions for calendar date pickers
   const disabledStartDate = start_date => {
-    if (!start_date || !end_date) {
+    if (!start_date || !state.end_date) {
       return moment().add(-1, 'days')  >= start_date;
     }
-      return moment().add(-1, 'days')  >= start_date || end_date < start_date;
+      return moment().add(-1, 'days')  >= start_date || state.end_date < start_date;
   };
 
   const disabledEndDate = end_date => {
-    if (!end_date || !start_date) {
+    if (!end_date || !state.start_date) {
       return moment().add(-1, 'days')  >= end_date;
     }
-    return end_date < start_date;
+    return end_date < state.start_date;
   };
 
   const onStartChange = value => {
-    setStart_date(value);
+    dispatch({
+      type: 'SET_START_DATE',
+      payload: value
+    })
   };
 
   const onEndChange = value => {
-    setEnd_date(value);
+    dispatch({
+      type: 'SET_END_DATE',
+      payload: value
+    })
   };
 
   const handleStartOpenChange = open => {
     if (!open) {
-      setEndOpen(true);
+      dispatch({
+        type: 'SET_ENDOPEN',
+        payload: true
+      })
     }
   };
 
   const handleEndOpenChange = open => {
-    setEndOpen(open);
+    dispatch({
+      type: 'SET_ENDOPEN',
+      payload: open
+    })
   };
   //end functions for calendar date pickers
 
   const pickCategories = event => {
     const {value, checked} = event.target;
     if (checked){
-      let category1 = categories.concat()
+      let category1 = state.categories.concat()
       category1.push(value)
-      setCategories(category1)
+      dispatch({
+        type: 'SET_CATEGORIES',
+        payload: category1
+      })
     } else {
-      const index = categories.indexOf(value);
+      const index = state.categories.indexOf(value);
       if (index > -1){
-        let category1 = categories.concat()
+        let category1 = state.categories.concat()
         category1.splice(index, 1);
-        setCategories(category1)
+        dispatch({
+          type: 'SET_CATEGORIES',
+          payload: category1
+        })
       }
     }
   };
 
   const setTime = hours_per_day => {
-    setHours_per_day(hours_per_day)
+    dispatch({
+      type: 'SET_HOURS_PER_DAY',
+      payload: hours_per_day
+    })
   };
 
   const handleSubmit = () => {
     axios.post('/api/user_agendas',
       {
       email: cookies.get('email'),
-      start_date: start_date.format('YYYY-MM-DD'),
-      end_date: end_date.format('YYYY-MM-DD'),
-      categories: categories,
-      hours_per_day: hours_per_day
+      start_date: state.start_date.format('YYYY-MM-DD'),
+      end_date: state.end_date.format('YYYY-MM-DD'),
+      categories: state.categories,
+      hours_per_day: state.hours_per_day
       })
-      .then(() => setRedirect(true));
+      .then(() =>   dispatch({
+        type: 'SET_REDIRECT',
+        payload: true
+      }));
   }
 
   const isFormValid = () => {
-    return hours_per_day && categories.length && start_date && end_date
+    return state.hours_per_day && state.categories.length && state.start_date && state.end_date
   }
 
   const formItemLayout = {
@@ -97,7 +159,8 @@ function Schedule(props) {
     },
   };
 
-  if (redirect) {
+  if (state.redirect) {
+    console.log(state.redirect);
     return <Redirect to={`/${moment().format('YYYY-MM-DD')}/activities`}/>;
   }
 
@@ -120,7 +183,7 @@ function Schedule(props) {
             disabledDate={disabledStartDate}
             showTime
             format="YYYY-MM-DD"
-            value={start_date}
+            value={state.start_date}
             placeholder="Star Date"
             onChange={onStartChange}
             onOpenChange={handleStartOpenChange}
@@ -131,10 +194,10 @@ function Schedule(props) {
             disabledDate={disabledEndDate}
             showTime
             format="YYYY-MM-DD"
-            value={end_date}
+            value={state.end_date}
             placeholder="End Date"
             onChange={onEndChange}
-            // open={endOpen}
+            open={state.endOpen}
             onOpenChange={handleEndOpenChange}
           />
         </Form.Item>
