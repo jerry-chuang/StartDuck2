@@ -5,8 +5,7 @@ import ActivitiesList from './ActivitiesList.jsx';
 import axios from 'axios';
 import * as moment from 'moment';
 
-function Activities (props) {
-  const {cookies, params} = props;
+function Activities ({cookies, params}) {
   const initialState = {
     activities: [],
     categories: [],
@@ -59,7 +58,7 @@ function Activities (props) {
         scheduleRedirect: true
       })
     }
-  })
+  }, [data])
 
   function getActivities(){
     axios.get('/api/user_activities', {
