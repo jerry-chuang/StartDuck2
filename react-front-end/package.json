@@ -10,7 +10,7 @@
     "react-markdown": "^4.1.0",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "^3.0.1",
+    "react-scripts": "^5.0.1",
     "react-slide-toggle": "^0.2.5",
     "universal-cookie": "^4.0.2"
   },
